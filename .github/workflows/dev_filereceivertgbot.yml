@@ -1,4 +1,6 @@
 name: Azure App Service - filereceivertgbot(Production), Build and deploy DotnetCore app
+env:
+  DOTNET_ROOT: "."
 
 on:
   push:
@@ -7,14 +9,11 @@ on:
 
 jobs:
   build-and-deploy:
-    needs: project-build
     runs-on: windows-latest
 
     steps:
-    # checkout the repo
-    - name: 'Checkout Github Action'
+    - name: 'Checkout repo'
       uses: actions/checkout@master
-
 
     - name: Set up .NET Core
       uses: actions/setup-dotnet@v1
@@ -33,5 +32,5 @@ jobs:
         app-name: filereceivertgbot
         slot-name: Production
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_92CCA54CE7D6497D841104EE763EF0C7 }}
-        package: ${{env.DOTNET_ROOT}}/myapp
+        package: ${{env.DOTNET_ROOT}}/filereceiver
 
