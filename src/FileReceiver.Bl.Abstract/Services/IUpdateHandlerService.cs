@@ -2,7 +2,7 @@
 
 using Telegram.Bot.Types;
 
-namespace FileReceiverBot.Api.Services.Abstract
+namespace FileReceiver.Bl.Abstract.Services
 {
     public interface IUpdateHandlerService
     {

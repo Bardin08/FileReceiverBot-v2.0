@@ -1,6 +1,9 @@
+using FileReceiver.Bl.Abstract.Services;
+using FileReceiver.Bl.Impl;
+using FileReceiver.Bl.Impl.Services;
+using FileReceiver.Dal;
+
 using FileReceiverBot.Api.Configuration;
-using FileReceiverBot.Api.Services.Abstract;
-using FileReceiverBot.Api.Services.Impl;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,7 +37,9 @@ namespace FileReceiverBot.Api
 
             services.AddSingleton(botSettings);
             services.AddTransient<ITelegramBotClient>(o => new TelegramBotClient(Configuration["BotSettings:Token"]));
-
+            services.AddBl();
+            services.AddDb(Configuration);
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FileReceiverBot.Api", Version = "v1" });
