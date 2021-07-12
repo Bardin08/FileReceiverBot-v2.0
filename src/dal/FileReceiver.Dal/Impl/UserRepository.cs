@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities;

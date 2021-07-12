@@ -1,4 +1,4 @@
-﻿using FileReceiver.Dal.Abstract.Repositories;
+using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Impl;
 
 using Microsoft.EntityFrameworkCore;

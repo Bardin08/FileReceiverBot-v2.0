@@ -47,7 +47,7 @@ namespace FileReceiverBot.Api
             services.AddTransient<ITelegramBotClient>(o => new TelegramBotClient(Configuration["BotSettings:Token"]));
             services.AddBl();
             services.AddDb(Configuration);
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FileReceiverBot.Api", Version = "v1" });

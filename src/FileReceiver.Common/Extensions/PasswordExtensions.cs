@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 
 namespace FileReceiver.Common.Extensions

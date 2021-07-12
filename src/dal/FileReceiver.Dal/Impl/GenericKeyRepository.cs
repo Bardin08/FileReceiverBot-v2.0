@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FileReceiver.Dal.Impl
 {
-    public abstract class GenericKeyRepository<TKey, TEntity, TContext> : IGenericKeyRepository<TKey, TEntity> 
-        where TContext: DbContext
-        where TEntity: class
+    public abstract class GenericKeyRepository<TKey, TEntity, TContext> : IGenericKeyRepository<TKey, TEntity>
+        where TContext : DbContext
+        where TEntity : class
     {
         protected GenericKeyRepository(TContext context)
         {

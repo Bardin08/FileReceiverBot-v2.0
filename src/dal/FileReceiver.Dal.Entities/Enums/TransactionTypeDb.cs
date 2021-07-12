@@ -1,4 +1,4 @@
-﻿namespace FileReceiver.Dal.Entities.Enums
+namespace FileReceiver.Dal.Entities.Enums
 {
     public enum TransactionTypeDb
     {

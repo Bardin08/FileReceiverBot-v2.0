@@ -1,4 +1,4 @@
-﻿using FileReceiver.Dal.Entities;
+using FileReceiver.Dal.Entities;
 using FileReceiver.Dal.Entities.Enums;
 
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +9,7 @@ using Npgsql.NameTranslation;
 namespace FileReceiver.Dal
 {
     public class FileReceiverDbContext : DbContext
-    {      
+    {
         public FileReceiverDbContext(DbContextOptions options) : base(options)
         {
             RegisterPgTypes();

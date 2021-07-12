@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 using FileReceiver.Bl.Impl.AutoMapper.ValueResolvers;
 using FileReceiver.Common.Models;

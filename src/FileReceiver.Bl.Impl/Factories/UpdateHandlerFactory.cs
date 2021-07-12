@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Handlers;

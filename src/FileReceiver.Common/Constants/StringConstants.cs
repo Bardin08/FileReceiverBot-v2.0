@@ -1,7 +1,7 @@
-﻿namespace FileReceiver.Common.Constants
+namespace FileReceiver.Common.Constants
 {
     public class StringConstants
     {
-        public static readonly char[] Delimiters = {' ', ',', '.', '-', '@', '!', '=', '+'};
+        public static readonly char[] Delimiters = { ' ', ',', '.', '-', '@', '!', '=', '+' };
     }
 }

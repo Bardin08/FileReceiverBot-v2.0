@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,15 +20,15 @@ namespace FileReceiver.Dal.Impl
         public async Task<bool> CheckIfTransactionForUserExists(long userId, TransactionTypeDb transactionType,
             TransactionStateDb transactionState)
         {
-            return await Context.Transactions.AnyAsync(transaction => transaction.UserId == userId 
-                                                            && transaction.TransactionType == transactionType 
+            return await Context.Transactions.AnyAsync(transaction => transaction.UserId == userId
+                                                            && transaction.TransactionType == transactionType
                                                             && transaction.TransactionState == transactionState);
         }
-        
+
         public async Task<TransactionEntity> GetByUserIdAsync(long userId, TransactionTypeDb transactionType)
         {
             return await Context.Transactions
-                .Where(transaction => transaction.UserId == userId 
+                .Where(transaction => transaction.UserId == userId
                                                && transaction.TransactionType == transactionType
                                                && transaction.TransactionState == TransactionStateDb.Active)
                 .Include(x => x.User)
@@ -47,7 +47,7 @@ namespace FileReceiver.Dal.Impl
         public async Task<TransactionEntity> GetLastActiveTransactionByUserId(long userId)
         {
             return await Context.Transactions
-                .SingleOrDefaultAsync(transaction => transaction.UserId == userId 
+                .SingleOrDefaultAsync(transaction => transaction.UserId == userId
                                                      && transaction.TransactionState == TransactionStateDb.Active);
         }
     }

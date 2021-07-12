@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Entities;

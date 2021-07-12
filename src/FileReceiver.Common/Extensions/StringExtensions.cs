@@ -1,4 +1,4 @@
-﻿using FileReceiver.Common.Constants;
+using FileReceiver.Common.Constants;
 
 namespace FileReceiver.Common.Extensions
 {

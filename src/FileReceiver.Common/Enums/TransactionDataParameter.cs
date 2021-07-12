@@ -1,4 +1,4 @@
-﻿namespace FileReceiver.Common.Enums
+namespace FileReceiver.Common.Enums
 {
     public enum TransactionDataParameter
     {

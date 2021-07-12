@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
@@ -38,7 +38,7 @@ namespace FileReceiver.Common.Models
             return _parameters[parameter] ?? new object();
         }
 
-        public T GetDataPiece<T>(TransactionDataParameter parameter) where T: new()
+        public T GetDataPiece<T>(TransactionDataParameter parameter) where T : new()
         {
             // As complex objects stores as a JSON this check is required 
             try
@@ -56,7 +56,7 @@ namespace FileReceiver.Common.Models
 
             return (T)_parameters[parameter] ?? new T();
         }
-        
+
         public void AddDataPiece(TransactionDataParameter parameter, [NotNull] object value)
         {
             _parameters.Add(parameter, value);

@@ -1,4 +1,4 @@
-﻿namespace FileReceiverBot.Api.Configuration
+namespace FileReceiverBot.Api.Configuration
 {
     public class BotSettings
     {

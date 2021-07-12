@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using AutoMapper;
 
@@ -32,7 +32,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<IBotMessagesService, BotMessagesService>();
             services.AddTransient<ISystemClock, SystemClock>();
         }
-        
+
         private static void AddMapperConfiguration(this IServiceCollection services)
         {
             services.AddAutoMapper(x => x.AddProfiles(
@@ -40,7 +40,7 @@ namespace FileReceiver.Bl.Impl
                 {
                     new RegistrationProfile(),
                     new TransactionsProfile(),
-                }    
+                }
             ));
         }
 

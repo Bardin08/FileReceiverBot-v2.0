@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -42,7 +42,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         public async Task HandleUpdateAsync(Update update)
         {
             var userId = update.Message.From.Id;
-            
+
             if (!await _transactionRepository.CheckIfTransactionForUserExists(
                 userId, TransactionTypeDb.Registration, TransactionStateDb.Active))
             {
@@ -63,7 +63,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 TransactionData = transactionData,
             };
 
-            switch(registrationState)
+            switch (registrationState)
             {
                 case RegistrationState.NewUser:
                     break;
@@ -92,25 +92,25 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
 
             userModel.FirstName = model.Update.Message.Text;
-            
+
             await _botMessagesService.SendTextMessageAsync(model.UserId,
                 $"Great, {model.Update.Message.Text}, now I need your lastname to continue");
             model.TransactionData.UpdateParameter(
                 TransactionDataParameter.UserModel, userModel);
             model.TransactionData.UpdateParameter(
                 TransactionDataParameter.RegistrationState, RegistrationState.LastNameReceived.ToString());
-            
+
             model.TransactionEntity.TransactionData = model.TransactionData.ParametersAsJson;
             await _transactionRepository.UpdateAsync(model.TransactionEntity);
         }
-        
+
         private async Task ProcessLastNameReceivedStateAsync(RegistrationProcessingModel model)
         {
             var userModel = model.TransactionData
                 .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
 
             userModel.LastName = model.Update.Message.Text;
-            
+
             await _botMessagesService.SendTextMessageAsync(model.UserId,
                 "Great, and the last step please send me a word or a sentence" +
                 " which I'll sometimes to confirm your actions");
@@ -129,7 +129,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
 
             userModel.SecretWordHash = model.Update.Message.Text.CreateHash();
-            
+
             await _botMessagesService.SendTextMessageAsync(model.UserId,
                 "Great, and the last step please send me a word or a sentence" +
                 " which I'll sometimes to confirm your actions");
@@ -173,7 +173,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 await _userRepository.UpdateAsync(existingUser);
             }
         }
-        
+
         private class RegistrationProcessingModel
         {
             public long UserId { get; init; }

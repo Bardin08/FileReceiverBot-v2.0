@@ -28,7 +28,7 @@ namespace FileReceiverBot.Api
 
             return host;
         }
-        
+
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });

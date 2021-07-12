@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -53,7 +53,7 @@ namespace FileReceiver.Bl.Impl.Services
                 return;
             }
 
-            if (await TryGetCommandHandlerAsync(update.Message) is { } commandHandler) 
+            if (await TryGetCommandHandlerAsync(update.Message) is { } commandHandler)
             {
                 // TODO: Create a command data set(maybe done with one more factory)
                 await commandHandler.HandleCommandAsync(update);

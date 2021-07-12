@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 using AutoMapper;
 
@@ -48,7 +48,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
                     "Account for this user is already exists. To edit it you can use /profile_update command");
                 return;
             }
-            
+
             if (await TryGetCompletedRegistrationTransactionAsync(userId))
             {
                 await _botMessagesService.SendErrorAsync(userId,

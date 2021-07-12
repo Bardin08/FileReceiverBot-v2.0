@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Handlers;
@@ -28,7 +28,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
         public async Task HandleCommandAsync(Update update)
         {
             var userId = update.Message.From.Id;
-            
+
             var userAccount = await _userRepository.GetByIdAsync(userId);
             if (userAccount == null)
             {

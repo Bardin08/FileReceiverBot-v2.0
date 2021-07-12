@@ -1,6 +1,9 @@
-﻿using System;
+using System;
+
 using FileReceiver.Dal.Entities.Enums;
+
 using Microsoft.EntityFrameworkCore.Migrations;
+
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FileReceiver.Dal.Migrations

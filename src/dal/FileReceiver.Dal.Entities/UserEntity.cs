@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,7 +18,7 @@ namespace FileReceiver.Dal.Entities
 
         public string SecretWordHash { get; set; }
         public RegistrationStateDb RegistrationState { get; set; }
-        
+
         public DateTimeOffset RegistrationStartTimestamp { get; set; }
         public DateTimeOffset? RegistrationEndTimestamp { get; set; }
     }

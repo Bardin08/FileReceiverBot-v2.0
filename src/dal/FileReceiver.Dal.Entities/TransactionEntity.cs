@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,9 +11,9 @@ namespace FileReceiver.Dal.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-        
+
         public long UserId { get; set; }
-        [ForeignKey(nameof(UserId))] 
+        [ForeignKey(nameof(UserId))]
         public UserEntity User { get; set; }
 
         public TransactionTypeDb TransactionType { get; set; }
