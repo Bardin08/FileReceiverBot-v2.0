@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -10,8 +11,6 @@ using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities;
 using FileReceiver.Dal.Entities.Enums;
 
-using Microsoft.Extensions.Internal;
-
 using Telegram.Bot.Types;
 
 namespace FileReceiver.Bl.Impl.Handlers.Commands
@@ -21,20 +20,17 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IBotMessagesService _botMessagesService;
-        private readonly ISystemClock _systemClock;
         private readonly IMapper _mapper;
 
         public RegisterCommandHandler(
             IBotMessagesService botMessagesService,
             ITransactionRepository transactionRepository,
             IUserRepository userRepository,
-            ISystemClock systemClock,
             IMapper mapper)
         {
             _botMessagesService = botMessagesService;
             _transactionRepository = transactionRepository;
             _userRepository = userRepository;
-            _systemClock = systemClock;
             _mapper = mapper;
         }
 
@@ -66,7 +62,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
                 Id = userId,
                 TelegramTag = update.Message.From.Username,
                 RegistrationState = RegistrationState.NewUser,
-                RegistrationStartTimestamp = _systemClock.UtcNow,
+                RegistrationStartTimestamp = DateTimeOffset.UtcNow,
             };
 
             await _userRepository.AddAsync(_mapper.Map<UserEntity>(userModel));

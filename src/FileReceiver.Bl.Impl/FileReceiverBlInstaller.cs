@@ -11,7 +11,6 @@ using FileReceiver.Bl.Impl.Handlers.TelegramUpdate;
 using FileReceiver.Bl.Impl.Services;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Internal;
 
 namespace FileReceiver.Bl.Impl
 {
@@ -30,7 +29,6 @@ namespace FileReceiver.Bl.Impl
         {
             services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
             services.AddTransient<IBotMessagesService, BotMessagesService>();
-            services.AddTransient<ISystemClock, SystemClock>();
         }
 
         private static void AddMapperConfiguration(this IServiceCollection services)

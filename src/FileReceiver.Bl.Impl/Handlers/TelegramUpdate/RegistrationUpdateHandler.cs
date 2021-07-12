@@ -24,19 +24,17 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly ISystemClock _systemClock;
 
-        public RegistrationUpdateHandler(IBotMessagesService botMessagesService,
+        public RegistrationUpdateHandler(
+            IBotMessagesService botMessagesService,
             ITransactionRepository transactionRepository,
             IUserRepository userRepository,
-            IMapper mapper,
-            ISystemClock systemClock)
+            IMapper mapper)
         {
             _botMessagesService = botMessagesService;
             _transactionRepository = transactionRepository;
             _userRepository = userRepository;
             _mapper = mapper;
-            _systemClock = systemClock;
         }
 
         public async Task HandleUpdateAsync(Update update)
@@ -168,7 +166,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 existingUser.LastName = updatedUser.LastName;
                 existingUser.RegistrationState = updatedUser.RegistrationState;
                 existingUser.SecretWordHash = updatedUser.SecretWordHash;
-                existingUser.RegistrationEndTimestamp = _systemClock.UtcNow;
+                existingUser.RegistrationEndTimestamp = DateTimeOffset.UtcNow;
 
                 await _userRepository.UpdateAsync(existingUser);
             }
