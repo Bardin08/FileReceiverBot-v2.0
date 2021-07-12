@@ -10,7 +10,7 @@ namespace FileReceiver.Common.Models
         public long UserId { get; set; }
 
         public TransactionType TransactionType { get; set; }
-        public TransactionDataModel TransactionDataModel { get; set; }
+        public TransactionDataModel TransactionData { get; set; }
         public TransactionState TransactionState { get; set; }
     }
 }

@@ -42,23 +42,25 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
         {
             var userId = update.Message.From.Id;
 
-            if (await TryGetUserProfile(userId))
-            {
-                await _botMessagesService.SendErrorAsync(userId,
-                    "Account for this account registration process has already started." +
-                    " To start a new one you should cancel the previous one with a command /cancel");
-                return;
-            }
-            
-            if (await TryGetRegistrationTransaction(userId))
+            if (await _userRepository.CheckIfUserExists(userId))
             {
                 await _botMessagesService.SendErrorAsync(userId,
                     "Account for this user is already exists. To edit it you can use /profile_update command");
                 return;
             }
+            
+            if (await TryGetCompletedRegistrationTransactionAsync(userId))
+            {
+                await _botMessagesService.SendErrorAsync(userId,
+                    "For this account registration process has already started." +
+                    " To start a new one you should cancel the previous one with a command /cancel");
+                return;
+            }
+            await CreateRegistrationTransaction(userId, update);
+        }
 
-            var registrationTransactionData = new TransactionDataModel();
-
+        private async Task CreateRegistrationTransaction(long userId, Update update)
+        {
             var userModel = new UserModel()
             {
                 Id = userId,
@@ -69,25 +71,29 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
 
             await _userRepository.AddAsync(_mapper.Map<UserEntity>(userModel));
 
+            var registrationTransactionData = new TransactionDataModel();
+
+            await _botMessagesService.SendTextMessageAsync(userId, "Send me your first name...");
+
+            registrationTransactionData.UpdateParameter(
+                TransactionDataParameter.RegistrationState, RegistrationState.FirstNameReceived.ToString());
             registrationTransactionData.AddDataPiece(TransactionDataParameter.UserModel, userModel);
+
             var registrationTransaction = new TransactionModel()
             {
                 UserId = userId,
                 TransactionType = TransactionType.Registration,
                 TransactionState = TransactionState.Active,
-                TransactionDataModel = new TransactionDataModel()
+                TransactionData = registrationTransactionData,
             };
+
             await _transactionRepository.AddAsync(_mapper.Map<TransactionEntity>(registrationTransaction));
         }
 
-        private async Task<bool> TryGetRegistrationTransaction(long userId)
+        private async Task<bool> TryGetCompletedRegistrationTransactionAsync(long userId)
         {
-            return (await _transactionRepository.GetByUserIdAsync(userId, TransactionTypeDb.Registration)) != null;
-        }
-
-        private async Task<bool> TryGetUserProfile(long userId)
-        {
-            return (await _userRepository.GetByIdAsync(userId)) != null;
+            return (await _transactionRepository
+                .GetCompletedTransactionByUserIdAsync(userId, TransactionTypeDb.Registration)) != null;
         }
     }
 }

@@ -7,6 +7,6 @@ namespace FileReceiver.Bl.Abstract.Factories
 {
     public interface IUpdateHandlerFactory
     {
-        Task<IUpdateHandler> CreateUpdateHandlerAsync(TransactionModel transaction);
+        IUpdateHandler CreateUpdateHandler(TransactionModel transaction);
     }
 }

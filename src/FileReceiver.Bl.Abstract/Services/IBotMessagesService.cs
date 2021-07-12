@@ -6,6 +6,7 @@ namespace FileReceiver.Bl.Abstract.Services
     {
         Task SendMenuAsync(long userOrChatId);
         Task SendErrorAsync(long userOrChatId, string errorMessage);
+        Task SendTextMessageAsync(long userOrChatId, string message);
         Task SendNotSupportedAsync(long userOrChatId, string notSupportedActionName);
     }
 }

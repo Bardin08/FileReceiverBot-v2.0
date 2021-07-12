@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using FileReceiver.Dal.Abstract.Repositories;
@@ -16,12 +17,31 @@ namespace FileReceiver.Dal.Impl
         {
         }
 
+        public async Task<bool> CheckIfTransactionForUserExists(long userId, TransactionTypeDb transactionType,
+            TransactionStateDb transactionState)
+        {
+            return await Context.Transactions.AnyAsync(transaction => transaction.UserId == userId 
+                                                            && transaction.TransactionType == transactionType 
+                                                            && transaction.TransactionState == transactionState);
+        }
+        
         public async Task<TransactionEntity> GetByUserIdAsync(long userId, TransactionTypeDb transactionType)
         {
             return await Context.Transactions
-                .FirstOrDefaultAsync(transaction => transaction.UserId == userId 
+                .Where(transaction => transaction.UserId == userId 
                                                && transaction.TransactionType == transactionType
-                                               && transaction.TransactionState == TransactionStateDb.Active);
+                                               && transaction.TransactionState == TransactionStateDb.Active)
+                .Include(x => x.User)
+                .SingleOrDefaultAsync();
+        }
+
+        public async Task<TransactionEntity> GetCompletedTransactionByUserIdAsync(long userId,
+            TransactionTypeDb transactionType)
+        {
+            return await Context.Transactions
+                .FirstOrDefaultAsync(transaction => transaction.UserId == userId
+                                                    && transaction.TransactionType == transactionType
+                                                    && transaction.TransactionState == TransactionStateDb.Committed);
         }
 
         public async Task<TransactionEntity> GetLastActiveTransactionByUserId(long userId)

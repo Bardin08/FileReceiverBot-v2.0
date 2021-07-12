@@ -3,5 +3,6 @@
     public enum TransactionDataParameter
     {
         UserModel = 0,
+        RegistrationState = 1,
     }
 }

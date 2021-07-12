@@ -47,14 +47,11 @@ namespace FileReceiver.Bl.Impl.Services
             // TODO: Add more secure way to receive user's Id
             var userId = update.Message.From.Id;
 
-            // if (await TryGetUpdateHandlerAsync(update, userId) is { } updateHandler)
-            // {
-            //     // TODO: Create an update data set(maybe done with one more factory)
-            //     // check if there're any active transactions for user at the database.
-            //     // if yes receive last and process that message else try to get a command handler
-            //     await updateHandler.HandleUpdateAsync(update);
-            //     return;
-            // }
+            if ((await TryGetUpdateHandlerAsync(userId)) is { } updateHandler)
+            {
+                await updateHandler.HandleUpdateAsync(update);
+                return;
+            }
 
             if (await TryGetCommandHandlerAsync(update.Message) is { } commandHandler) 
             {
@@ -73,22 +70,22 @@ namespace FileReceiver.Bl.Impl.Services
             await _botClient.SendTextMessageAsync(fromId, "Sorry, I can`t understand you!");
         }
 
-        private async Task<IUpdateHandler> TryGetUpdateHandlerAsync(Update update, long userId)
+        private async Task<IUpdateHandler> TryGetUpdateHandlerAsync(long userId)
         {
-            var lastActiveTransaction = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
-            if (lastActiveTransaction == null)
+            var lastActiveTransactionForUser = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
+            if (lastActiveTransactionForUser == null)
             {
                 return null;
             }
 
-            return await _updateHandlerFactory.CreateUpdateHandlerAsync(
-                _mapper.Map<TransactionModel>(lastActiveTransaction));
+            return _updateHandlerFactory.CreateUpdateHandler(
+                _mapper.Map<TransactionModel>(lastActiveTransactionForUser));
         }
 
-        private async Task<ICommandHandler> TryGetCommandHandlerAsync(Message message)
+        private Task<ICommandHandler> TryGetCommandHandlerAsync(Message message)
         {
             // TODO: Add a command detection logic
-            return _commandHandlerFactory.CreateCommandHandler(message.Text.GetCommandFromMessage());
+            return Task.FromResult(_commandHandlerFactory.CreateCommandHandler(message.Text.GetCommandFromMessage()));
         }
     }
 }

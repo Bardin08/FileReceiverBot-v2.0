@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl;
 using FileReceiver.Bl.Impl.Services;
@@ -11,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 using Telegram.Bot;
 
@@ -28,7 +33,10 @@ namespace FileReceiverBot.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(opt =>
+                {
+                    opt.SerializerSettings.Converters.Add(new StringEnumConverter());
+                });
 
             services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
 

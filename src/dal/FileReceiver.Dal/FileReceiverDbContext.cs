@@ -15,15 +15,15 @@ namespace FileReceiver.Dal
             RegisterPgTypes();
         }
 
+        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<TransactionEntity> Transactions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasPostgresEnum(nameof(TransactionTypeDb), typeof(TransactionTypeDb).GetEnumNames());
             modelBuilder.HasPostgresEnum(nameof(TransactionStateDb), typeof(TransactionStateDb).GetEnumNames());
             modelBuilder.HasPostgresEnum(nameof(RegistrationStateDb), typeof(RegistrationStateDb).GetEnumNames());
         }
-
-        public DbSet<UserEntity> Users { get; set; }
-        public DbSet<TransactionEntity> Transactions { get; set; }
 
         private static void RegisterPgTypes()
         {

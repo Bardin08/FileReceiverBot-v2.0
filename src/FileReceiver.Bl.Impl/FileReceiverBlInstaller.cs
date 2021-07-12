@@ -7,6 +7,7 @@ using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl.AutoMapper.Profiles;
 using FileReceiver.Bl.Impl.Factories;
 using FileReceiver.Bl.Impl.Handlers.Commands;
+using FileReceiver.Bl.Impl.Handlers.TelegramUpdate;
 using FileReceiver.Bl.Impl.Services;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -21,13 +22,13 @@ namespace FileReceiver.Bl.Impl
             services.AddServices();
             services.AddMapperConfiguration();
             services.AddCommandHandlers();
+            services.AddUpdateHandlers();
             services.AddFactories();
         }
 
         private static void AddServices(this IServiceCollection services)
         {
             services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
-            services.AddTransient<IRegistrationService, RegistrationService>();
             services.AddTransient<IBotMessagesService, BotMessagesService>();
             services.AddTransient<ISystemClock, SystemClock>();
         }
@@ -49,6 +50,12 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<RegisterCommandHandler, RegisterCommandHandler>();
             services.AddTransient<CancelCommandHandler, CancelCommandHandler>();
             services.AddTransient<DefaultCommandHandler, DefaultCommandHandler>();
+        }
+
+        private static void AddUpdateHandlers(this IServiceCollection services)
+        {
+            services.AddTransient<RegistrationUpdateHandler, RegistrationUpdateHandler>();
+            services.AddTransient<DefaultUpdateHandler, DefaultUpdateHandler>();
         }
 
         private static void AddFactories(this IServiceCollection services)

@@ -29,6 +29,11 @@ namespace FileReceiver.Bl.Impl.Services
                 $"Sorry, an error happen. Error description: {errorMessage}");
         }
 
+        public async Task SendTextMessageAsync(long userOrChatId, string message)
+        {
+            await _botClient.SendTextMessageAsync(userOrChatId, message);
+        }
+
         public async Task SendNotSupportedAsync(long userOrChatId, string notSupportedActionName)
         {
             await _botClient.SendTextMessageAsync(userOrChatId,
