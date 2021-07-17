@@ -25,7 +25,10 @@ namespace FileReceiver.Bl.Impl.Factories
                 "/register" => _serviceProvider.GetService<RegisterCommandHandler>(),
                 "/cancel" => _serviceProvider.GetService<CancelCommandHandler>(),
                 "/abort" => _serviceProvider.GetService<CancelCommandHandler>(),
-                _ => _serviceProvider.GetService<DefaultCommandHandler>(),
+                "/profile" => _serviceProvider.GetService<ProfileCommandHandler>(),
+                "/profile_edit" => _serviceProvider.GetService<ProfileEditCommandHandler>(),
+                { } when command.StartsWith("/") => _serviceProvider.GetService<DefaultCommandHandler>(),
+                _ => null
             };
         }
     }

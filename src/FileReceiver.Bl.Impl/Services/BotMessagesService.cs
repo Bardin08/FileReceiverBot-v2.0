@@ -4,6 +4,7 @@ using FileReceiver.Bl.Abstract.Services;
 
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FileReceiver.Bl.Impl.Services
 {
@@ -32,6 +33,11 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task SendTextMessageAsync(long userOrChatId, string message)
         {
             await _botClient.SendTextMessageAsync(userOrChatId, message);
+        }
+
+        public async Task SendMessageWithKeyboardAsync(long userOrChatId, string message, IReplyMarkup keyboard)
+        {
+            await _botClient.SendTextMessageAsync(userOrChatId, message, ParseMode.Markdown, replyMarkup: keyboard);
         }
 
         public async Task SendNotSupportedAsync(long userOrChatId, string notSupportedActionName)

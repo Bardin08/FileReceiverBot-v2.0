@@ -7,8 +7,10 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.1" />
       <PackageReference Include="Telegram.Bot" Version="16.0.1" />
+      <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
     </ItemGroup>
 
     <ItemGroup>

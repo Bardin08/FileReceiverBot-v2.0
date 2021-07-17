@@ -12,26 +12,28 @@ using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities;
 using FileReceiver.Dal.Entities.Enums;
 
-using Microsoft.Extensions.Internal;
-
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 {
     public class RegistrationUpdateHandler : IUpdateHandler
     {
         private readonly IBotMessagesService _botMessagesService;
+        private readonly IUserRegistrationService _registrationService;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
         public RegistrationUpdateHandler(
             IBotMessagesService botMessagesService,
+            IUserRegistrationService registrationService,
             ITransactionRepository transactionRepository,
             IUserRepository userRepository,
             IMapper mapper)
         {
             _botMessagesService = botMessagesService;
+            _registrationService = registrationService;
             _transactionRepository = transactionRepository;
             _userRepository = userRepository;
             _mapper = mapper;
@@ -61,6 +63,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 TransactionData = transactionData,
             };
 
+            // TODO: rewrite with pattern matching
             switch (registrationState)
             {
                 case RegistrationState.NewUser:
@@ -86,90 +89,37 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 
         private async Task ProcessFirstNameReceivedStateAsync(RegistrationProcessingModel model)
         {
-            var userModel = model.TransactionData
-                .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
+            var firstName = model.Update.Message.Text;
 
-            userModel.FirstName = model.Update.Message.Text;
-
+            await _registrationService.SetFirstNameAsync(model.UserId, firstName);
             await _botMessagesService.SendTextMessageAsync(model.UserId,
-                $"Great, {model.Update.Message.Text}, now I need your lastname to continue");
-            model.TransactionData.UpdateParameter(
-                TransactionDataParameter.UserModel, userModel);
-            model.TransactionData.UpdateParameter(
-                TransactionDataParameter.RegistrationState, RegistrationState.LastNameReceived.ToString());
-
-            model.TransactionEntity.TransactionData = model.TransactionData.ParametersAsJson;
-            await _transactionRepository.UpdateAsync(model.TransactionEntity);
+                $"Great, {firstName}, now I need your lastname to continue");
         }
 
         private async Task ProcessLastNameReceivedStateAsync(RegistrationProcessingModel model)
         {
-            var userModel = model.TransactionData
-                .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
+            var lastName = model.Update.Message.Text;
 
-            userModel.LastName = model.Update.Message.Text;
-
+            await _registrationService.SetLastNameAsync(model.UserId, lastName);
             await _botMessagesService.SendTextMessageAsync(model.UserId,
                 "Great, and the last step please send me a word or a sentence" +
                 " which I'll sometimes to confirm your actions");
-            model.TransactionData.UpdateParameter(
-                TransactionDataParameter.UserModel, userModel);
-            model.TransactionData.UpdateParameter(
-                TransactionDataParameter.RegistrationState, RegistrationState.SecretWordReceived.ToString());
-
-            model.TransactionEntity.TransactionData = model.TransactionData.ParametersAsJson;
-            await _transactionRepository.UpdateAsync(model.TransactionEntity);
         }
 
         private async Task ProcessSecretWordReceivedStateAsync(RegistrationProcessingModel model)
         {
-            var userModel = model.TransactionData
-                .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
+            var secretWord = model.Update.Message.Text;
 
-            userModel.SecretWordHash = model.Update.Message.Text.CreateHash();
-
-            await _botMessagesService.SendTextMessageAsync(model.UserId,
-                "Great, and the last step please send me a word or a sentence" +
-                " which I'll sometimes to confirm your actions");
-            model.TransactionData.UpdateParameter(
-                TransactionDataParameter.UserModel, userModel);
-            model.TransactionData.UpdateParameter(
-                TransactionDataParameter.RegistrationState, RegistrationState.RegistrationComplete);
-            model.TransactionEntity.TransactionState = TransactionStateDb.Committed;
-            model.TransactionEntity.TransactionData = model.TransactionData.ParametersAsJson;
-            await UpdateUserEntityAsync(userModel);
-
-            // TODO: Add confirmation message where user can agree with entered data or enter them all again
-            await _transactionRepository.UpdateAsync(model.TransactionEntity);
-
+            await _registrationService.SetSecretWordAsync(model.UserId, secretWord);
             await ProcessRegistrationCompleteStateAsync(model);
         }
 
         private async Task ProcessRegistrationCompleteStateAsync(RegistrationProcessingModel model)
         {
-            var userModel = model.TransactionData
-                .GetDataPiece<UserModel>(TransactionDataParameter.UserModel);
+            var user = await _registrationService.CompleteRegistrationAsync(model.UserId);
 
-            await _botMessagesService.SendTextMessageAsync(model.UserId,
-                $"Great, {userModel.FirstName}. Now you're registered");
+            await _botMessagesService.SendTextMessageAsync(model.UserId, $"Great {user.FirstName}, now you're registered");
             await _botMessagesService.SendMenuAsync(model.UserId);
-        }
-
-        private async Task UpdateUserEntityAsync(UserModel userModel)
-        {
-            var existingUser = await _userRepository.GetByIdAsync(userModel.Id);
-            if (existingUser != null)
-            {
-                var updatedUser = _mapper.Map<UserEntity>(userModel);
-
-                existingUser.FirstName = updatedUser.FirstName;
-                existingUser.LastName = updatedUser.LastName;
-                existingUser.RegistrationState = updatedUser.RegistrationState;
-                existingUser.SecretWordHash = updatedUser.SecretWordHash;
-                existingUser.RegistrationEndTimestamp = DateTimeOffset.UtcNow;
-
-                await _userRepository.UpdateAsync(existingUser);
-            }
         }
 
         private class RegistrationProcessingModel

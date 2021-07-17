@@ -23,8 +23,9 @@ namespace FileReceiver.Bl.Impl.Factories
         {
             return transaction.TransactionType switch
             {
-                TransactionType.Registration => _serviceProvider.GetService<RegistrationUpdateHandler>(),
                 TransactionType.Unknown => _serviceProvider.GetService<DefaultUpdateHandler>(),
+                TransactionType.Registration => _serviceProvider.GetService<RegistrationUpdateHandler>(),
+                TransactionType.EditProfile => _serviceProvider.GetService<EditProfileUpdateHandler>(),
                 _ => _serviceProvider.GetService<DefaultUpdateHandler>(),
             };
         }

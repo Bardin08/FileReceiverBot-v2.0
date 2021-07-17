@@ -1,5 +1,6 @@
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl;
+using FileReceiver.Bl.Impl.HostedServices;
 using FileReceiver.Bl.Impl.Services;
 using FileReceiver.Dal;
 
@@ -25,7 +26,7 @@ namespace FileReceiverBot.Api
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -41,9 +42,14 @@ namespace FileReceiverBot.Api
             Configuration.Bind(nameof(BotSettings), botSettings);
 
             services.AddSingleton(botSettings);
-            services.AddTransient<ITelegramBotClient>(o => new TelegramBotClient(Configuration["BotSettings:Token"]));
+            services.AddTransient<ITelegramBotClient>(_ => new TelegramBotClient(Configuration["BotSettings:Token"]));
             services.AddBl();
             services.AddDb(Configuration);
+
+            if (bool.Parse(Configuration["BotSettings:UseLongPolling"]))
+            {
+                services.AddHostedService<LongPolingService>();
+            }
 
             services.AddSwaggerGen(c =>
             {

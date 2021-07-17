@@ -4,5 +4,6 @@ namespace FileReceiver.Common.Enums
     {
         Unknown = 0,
         Registration = 1,
+        EditProfile = 2,
     }
 }

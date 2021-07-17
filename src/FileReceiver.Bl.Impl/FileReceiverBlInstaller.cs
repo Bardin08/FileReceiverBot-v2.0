@@ -6,6 +6,7 @@ using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl.AutoMapper.Profiles;
 using FileReceiver.Bl.Impl.Factories;
+using FileReceiver.Bl.Impl.Handlers.CallbackQuery;
 using FileReceiver.Bl.Impl.Handlers.Commands;
 using FileReceiver.Bl.Impl.Handlers.TelegramUpdate;
 using FileReceiver.Bl.Impl.Services;
@@ -22,6 +23,7 @@ namespace FileReceiver.Bl.Impl
             services.AddMapperConfiguration();
             services.AddCommandHandlers();
             services.AddUpdateHandlers();
+            services.AddCallbackQueryHandlers();
             services.AddFactories();
         }
 
@@ -29,6 +31,7 @@ namespace FileReceiver.Bl.Impl
         {
             services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
             services.AddTransient<IBotMessagesService, BotMessagesService>();
+            services.AddTransient<IUserRegistrationService, UserRegistrationService>();
         }
 
         private static void AddMapperConfiguration(this IServiceCollection services)
@@ -48,18 +51,27 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<RegisterCommandHandler, RegisterCommandHandler>();
             services.AddTransient<CancelCommandHandler, CancelCommandHandler>();
             services.AddTransient<DefaultCommandHandler, DefaultCommandHandler>();
+            services.AddTransient<ProfileCommandHandler, ProfileCommandHandler>();
+            services.AddTransient<ProfileEditCommandHandler, ProfileEditCommandHandler>();
         }
 
         private static void AddUpdateHandlers(this IServiceCollection services)
         {
             services.AddTransient<RegistrationUpdateHandler, RegistrationUpdateHandler>();
             services.AddTransient<DefaultUpdateHandler, DefaultUpdateHandler>();
+            services.AddTransient<EditProfileUpdateHandler, EditProfileUpdateHandler>();
+        }
+
+        private static void AddCallbackQueryHandlers(this IServiceCollection services)
+        {
+            services.AddTransient<EditProfileCallbackQueryHandler, EditProfileCallbackQueryHandler>();
         }
 
         private static void AddFactories(this IServiceCollection services)
         {
             services.AddTransient<ICommandHandlerFactory, CommandHandlerFactory>();
             services.AddTransient<IUpdateHandlerFactory, UpdateHandlerFactory>();
+            services.AddTransient<ICallbackQueryHandlerFactory, CallbackQueryHandlerFactory>();
         }
     }
 }
