@@ -41,7 +41,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
             if (await _userRepository.CheckIfUserExists(userId))
             {
                 await _botMessagesService.SendErrorAsync(userId,
-                    "Account for this user is already exists. To edit it you can use /profile_update command");
+                    "Account for this user is already exists. To edit it you can use /profile_edit command");
                 return;
             }
 
