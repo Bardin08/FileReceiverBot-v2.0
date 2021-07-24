@@ -16,6 +16,7 @@ namespace FileReceiver.Dal
 
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ITransactionRepository, TransactionRepository>();
+            services.AddTransient<IFileReceivingSessionRepository, FileReceivingSessionRepository>();
         }
     }
 }

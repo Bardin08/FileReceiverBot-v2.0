@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 
 using FileReceiver.Bl.Abstract.Handlers;
 using FileReceiver.Bl.Abstract.Services;
+using FileReceiver.Common.Extensions;
 using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities.Enums;
 
@@ -26,14 +27,9 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
 
         public async Task HandleCommandAsync(Update update)
         {
-            var userId = update.Message.From.Id;
+            var userId = update.GetTgUserId();
 
-            var activeTransaction = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
-            if (activeTransaction != null)
-            {
-                activeTransaction.TransactionState = TransactionStateDb.Aborted;
-                await _transactionRepository.UpdateAsync(activeTransaction);
-            }
+            await _transactionRepository.AbortAllTransactionsForUser(userId);
 
             await _botMessagesService.SendMenuAsync(userId);
         }

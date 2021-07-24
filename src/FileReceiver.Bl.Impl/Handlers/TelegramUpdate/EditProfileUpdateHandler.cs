@@ -32,7 +32,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 
         public async Task HandleUpdateAsync(Update update)
         {
-            var userId = update.Message.From.Id;
+            var userId = update.GetTgUserId();
 
             if (!await _transactionRepository.CheckIfTransactionForUserExists(
                 userId, TransactionTypeDb.EditProfile, TransactionStateDb.Active))

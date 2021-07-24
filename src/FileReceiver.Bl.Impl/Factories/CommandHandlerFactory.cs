@@ -27,6 +27,7 @@ namespace FileReceiver.Bl.Impl.Factories
                 "/abort" => _serviceProvider.GetService<CancelCommandHandler>(),
                 "/profile" => _serviceProvider.GetService<ProfileCommandHandler>(),
                 "/profile_edit" => _serviceProvider.GetService<ProfileEditCommandHandler>(),
+                "/start_receiving" => _serviceProvider.GetService<StartReceivingCommandHandler>(),
                 { } when command.StartsWith("/") => _serviceProvider.GetService<DefaultCommandHandler>(),
                 _ => null
             };

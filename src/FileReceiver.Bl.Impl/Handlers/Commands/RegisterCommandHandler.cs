@@ -6,6 +6,7 @@ using AutoMapper;
 using FileReceiver.Bl.Abstract.Handlers;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Enums;
+using FileReceiver.Common.Extensions;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities;
@@ -36,7 +37,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
 
         public async Task HandleCommandAsync(Update update)
         {
-            var userId = update.Message.From.Id;
+            var userId = update.GetTgUserId();
 
             if (await _userRepository.CheckIfUserExists(userId))
             {

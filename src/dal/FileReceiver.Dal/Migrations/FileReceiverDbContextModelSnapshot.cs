@@ -16,12 +16,55 @@ namespace FileReceiver.Dal.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasPostgresEnum(null, "FileReceivingSessionStateDb", new[] { "NewSession", "FileSizeConstraintSet", "FileNameConstraintSet", "FileExtensionConstraintSet", "SessionMaxFilesConstraint", "SetFilesStorage", "ActiveSession", "EndedSession" })
+                .HasPostgresEnum(null, "FileStorageTypeDb", new[] { "None", "Mega", "GoogleDrive" })
                 .HasPostgresEnum(null, "RegistrationStateDb", new[] { "NewUser", "FirstNameReceived", "LastNameReceived", "SecretWordReceived", "RegistrationComplete" })
+                .HasPostgresEnum(null, "SessionEndReasonDb", new[] { "EndedByOwner", "FilesLimitReached", "StoppedDueError" })
                 .HasPostgresEnum(null, "TransactionStateDb", new[] { "Active", "Failed", "Aborted", "Committed" })
-                .HasPostgresEnum(null, "TransactionTypeDb", new[] { "Unknown", "Registration", "EditProfile" })
+                .HasPostgresEnum(null, "TransactionTypeDb", new[] { "Unknown", "Registration", "EditProfile", "FileReceivingSessionCreating" })
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.7")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            modelBuilder.Entity("FileReceiver.Dal.Entities.FileReceivingSessionEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Constrains")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreateData")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FilesReceived")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxFiles")
+                        .HasColumnType("integer");
+
+                    b.Property<SessionEndReasonDb?>("SessionEndReason")
+                        .HasColumnType("\"SessionEndReasonDb\"");
+
+                    b.Property<FileReceivingSessionStateDb>("SessionState")
+                        .HasColumnType("\"FileReceivingSessionStateDb\"");
+
+                    b.Property<FileStorageTypeDb?>("Storage")
+                        .HasColumnType("\"FileStorageTypeDb\"");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FileReceivingSessions");
+                });
 
             modelBuilder.Entity("FileReceiver.Dal.Entities.TransactionEntity", b =>
                 {
@@ -79,6 +122,17 @@ namespace FileReceiver.Dal.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FileReceiver.Dal.Entities.FileReceivingSessionEntity", b =>
+                {
+                    b.HasOne("FileReceiver.Dal.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FileReceiver.Dal.Entities.TransactionEntity", b =>

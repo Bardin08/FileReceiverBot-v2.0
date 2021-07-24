@@ -41,12 +41,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 
         public async Task HandleUpdateAsync(Update update)
         {
-            var userId = update.Message.From.Id;
-
-            if (!await _transactionRepository.CheckIfTransactionForUserExists(
-                userId, TransactionTypeDb.Registration, TransactionStateDb.Active))
-            {
-            }
+            var userId = update.GetTgUserId();
 
             var transactionEntity = await _transactionRepository
                 .GetByUserIdAsync(userId, TransactionTypeDb.Registration);
@@ -63,7 +58,6 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 TransactionData = transactionData,
             };
 
-            // TODO: rewrite with pattern matching
             switch (registrationState)
             {
                 case RegistrationState.NewUser:

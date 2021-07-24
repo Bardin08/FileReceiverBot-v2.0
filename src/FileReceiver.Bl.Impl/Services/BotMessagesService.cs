@@ -32,7 +32,7 @@ namespace FileReceiver.Bl.Impl.Services
 
         public async Task SendTextMessageAsync(long userOrChatId, string message)
         {
-            await _botClient.SendTextMessageAsync(userOrChatId, message);
+            await _botClient.SendTextMessageAsync(userOrChatId, message, ParseMode.Markdown);
         }
 
         public async Task SendMessageWithKeyboardAsync(long userOrChatId, string message, IReplyMarkup keyboard)

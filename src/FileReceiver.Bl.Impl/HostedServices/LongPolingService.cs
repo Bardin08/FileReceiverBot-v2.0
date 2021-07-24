@@ -31,11 +31,18 @@ namespace FileReceiver.Bl.Impl.HostedServices
 
             await foreach (Update update in _updateReceiver.YieldUpdatesAsync().WithCancellation(stoppingToken))
             {
-                var updateHandlerService =
-                    _serviceProvider.CreateScope().ServiceProvider.GetService<IUpdateHandlerService>();
-                if (updateHandlerService != null)
+                try
                 {
-                    await updateHandlerService.HandleUpdateAsync(update);
+                    var updateHandlerService =
+                        _serviceProvider.CreateScope().ServiceProvider.GetService<IUpdateHandlerService>();
+                    if (updateHandlerService != null)
+                    {
+                        await updateHandlerService.HandleUpdateAsync(update);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
                 }
             }
         }
