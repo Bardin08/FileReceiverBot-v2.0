@@ -1,10 +1,10 @@
 using FileReceiver.Bl.Abstract.Handlers;
-using FileReceiver.Common.Models;
+using FileReceiver.Common.Enums;
 
 namespace FileReceiver.Bl.Abstract.Factories
 {
     public interface IUpdateHandlerFactory
     {
-        IUpdateHandler CreateUpdateHandler(TransactionModel transaction);
+        IUpdateHandler CreateUpdateHandler(TransactionType transactionType);
     }
 }

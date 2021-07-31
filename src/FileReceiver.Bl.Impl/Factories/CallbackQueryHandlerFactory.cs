@@ -25,7 +25,8 @@ namespace FileReceiver.Bl.Impl.Factories
             {
                 { Data: { } data } when data.StartsWith("profile-")
                     => _serviceProvider.GetService<EditProfileCallbackQueryHandler>(),
-                _ => throw new ArgumentOutOfRangeException(nameof(callbackQuery), callbackQuery, null)
+                { Data: { } data } when data.StartsWith("fr-session")
+                    => _serviceProvider.GetService<FileReceivingSessionCallbackQueryHandler>(),
             };
         }
     }

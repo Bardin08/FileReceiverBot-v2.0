@@ -1,8 +1,6 @@
 using System;
 using System.Threading.Tasks;
 
-using AutoMapper;
-
 using FileReceiver.Bl.Abstract.Handlers;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Enums;
@@ -13,7 +11,6 @@ using FileReceiver.Dal.Entities;
 using FileReceiver.Dal.Entities.Enums;
 
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 {
@@ -22,31 +19,20 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         private readonly IBotMessagesService _botMessagesService;
         private readonly IUserRegistrationService _registrationService;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
 
         public RegistrationUpdateHandler(
             IBotMessagesService botMessagesService,
             IUserRegistrationService registrationService,
-            ITransactionRepository transactionRepository,
-            IUserRepository userRepository,
-            IMapper mapper)
+            ITransactionRepository transactionRepository)
         {
             _botMessagesService = botMessagesService;
             _registrationService = registrationService;
             _transactionRepository = transactionRepository;
-            _userRepository = userRepository;
-            _mapper = mapper;
         }
 
         public async Task HandleUpdateAsync(Update update)
         {
-            var userId = update.Message.From.Id;
-
-            if (!await _transactionRepository.CheckIfTransactionForUserExists(
-                userId, TransactionTypeDb.Registration, TransactionStateDb.Active))
-            {
-            }
+            var userId = update.GetTgUserId();
 
             var transactionEntity = await _transactionRepository
                 .GetByUserIdAsync(userId, TransactionTypeDb.Registration);
@@ -63,7 +49,6 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 TransactionData = transactionData,
             };
 
-            // TODO: rewrite with pattern matching
             switch (registrationState)
             {
                 case RegistrationState.NewUser:

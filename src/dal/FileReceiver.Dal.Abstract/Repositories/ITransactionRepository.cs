@@ -13,5 +13,6 @@ namespace FileReceiver.Dal.Abstract.Repositories
         Task<TransactionEntity> GetByUserIdAsync(long userId, TransactionTypeDb transactionType);
         Task<TransactionEntity> GetCompletedTransactionByUserIdAsync(long userId, TransactionTypeDb transactionType);
         Task<TransactionEntity> GetLastActiveTransactionByUserId(long userId);
+        Task AbortAllTransactionsForUser(long userId);
     }
 }

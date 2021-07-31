@@ -5,5 +5,6 @@ namespace FileReceiver.Common.Enums
         UserModel = 0,
         RegistrationState = 1,
         ProfileEditingAction = 2,
+        FileReceivingSessionId = 3,
     }
 }

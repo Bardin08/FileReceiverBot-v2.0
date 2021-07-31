@@ -20,6 +20,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Bl.Abstract", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Bl.Impl", "src\FileReceiver.Bl.Impl\FileReceiver.Bl.Impl.csproj", "{9AC28975-E12B-449D-B340-782EBAB3E858}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Tests.Bl", "tests\FileReceiver.Tests.Bl\FileReceiver.Tests.Bl.csproj", "{97FA2C2F-34CE-46F3-A426-C5BF1E6A3C54}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{165C050E-2183-4DB4-A63D-B362532F77F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +39,7 @@ Global
 		{8D9067D7-7807-4616-9C5C-800B53EC5010} = {9045B708-F21E-4EB8-ABB2-76EB6695F6A3}
 		{92A3C8FD-79EE-4157-9035-C2110F8953DB} = {8D9067D7-7807-4616-9C5C-800B53EC5010}
 		{9AC28975-E12B-449D-B340-782EBAB3E858} = {8D9067D7-7807-4616-9C5C-800B53EC5010}
+		{97FA2C2F-34CE-46F3-A426-C5BF1E6A3C54} = {165C050E-2183-4DB4-A63D-B362532F77F4}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{70B0EF0C-D42D-4CF2-93E2-357FC9190A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -65,5 +70,9 @@ Global
 		{9AC28975-E12B-449D-B340-782EBAB3E858}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AC28975-E12B-449D-B340-782EBAB3E858}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AC28975-E12B-449D-B340-782EBAB3E858}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97FA2C2F-34CE-46F3-A426-C5BF1E6A3C54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97FA2C2F-34CE-46F3-A426-C5BF1E6A3C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97FA2C2F-34CE-46F3-A426-C5BF1E6A3C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97FA2C2F-34CE-46F3-A426-C5BF1E6A3C54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

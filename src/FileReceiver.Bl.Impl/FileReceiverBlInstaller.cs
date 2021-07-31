@@ -32,6 +32,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
             services.AddTransient<IBotMessagesService, BotMessagesService>();
             services.AddTransient<IUserRegistrationService, UserRegistrationService>();
+            services.AddTransient<IFileReceivingSessionService, FileReceivingSessionService>();
         }
 
         private static void AddMapperConfiguration(this IServiceCollection services)
@@ -41,6 +42,7 @@ namespace FileReceiver.Bl.Impl
                 {
                     new RegistrationProfile(),
                     new TransactionsProfile(),
+                    new FileReceivingSessionProfile(),
                 }
             ));
         }
@@ -53,6 +55,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<DefaultCommandHandler, DefaultCommandHandler>();
             services.AddTransient<ProfileCommandHandler, ProfileCommandHandler>();
             services.AddTransient<ProfileEditCommandHandler, ProfileEditCommandHandler>();
+            services.AddTransient<StartReceivingCommandHandler, StartReceivingCommandHandler>();
         }
 
         private static void AddUpdateHandlers(this IServiceCollection services)
@@ -60,11 +63,13 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<RegistrationUpdateHandler, RegistrationUpdateHandler>();
             services.AddTransient<DefaultUpdateHandler, DefaultUpdateHandler>();
             services.AddTransient<EditProfileUpdateHandler, EditProfileUpdateHandler>();
+            services.AddTransient<FileReceivingSessionCreatingUpdateHandler, FileReceivingSessionCreatingUpdateHandler>();
         }
 
         private static void AddCallbackQueryHandlers(this IServiceCollection services)
         {
             services.AddTransient<EditProfileCallbackQueryHandler, EditProfileCallbackQueryHandler>();
+            services.AddTransient<FileReceivingSessionCallbackQueryHandler, FileReceivingSessionCallbackQueryHandler>();
         }
 
         private static void AddFactories(this IServiceCollection services)

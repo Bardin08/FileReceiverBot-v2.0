@@ -9,14 +9,13 @@ using FileReceiver.Common.Extensions;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Abstract.Repositories;
 
-using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace FileReceiver.Bl.Impl.Services
 {
     public class UpdateHandlerService : IUpdateHandlerService
     {
-        private readonly ITelegramBotClient _botClient;
+        private readonly IBotMessagesService _botMessagesService;
         private readonly ICommandHandlerFactory _commandHandlerFactory;
         private readonly IUpdateHandlerFactory _updateHandlerFactory;
         private readonly ICallbackQueryHandlerFactory _callbackQueryFactory;
@@ -24,14 +23,14 @@ namespace FileReceiver.Bl.Impl.Services
         private readonly IMapper _mapper;
 
         public UpdateHandlerService(
-            ITelegramBotClient botClient,
+            IBotMessagesService botMessagesService,
             ICommandHandlerFactory commandHandlerFactory,
             IUpdateHandlerFactory updateHandlerFactory,
             ICallbackQueryHandlerFactory callbackQueryFactory,
             ITransactionRepository transactionRepository,
             IMapper mapper)
         {
-            _botClient = botClient;
+            _botMessagesService = botMessagesService;
             _commandHandlerFactory = commandHandlerFactory;
             _updateHandlerFactory = updateHandlerFactory;
             _callbackQueryFactory = callbackQueryFactory;
@@ -54,17 +53,26 @@ namespace FileReceiver.Bl.Impl.Services
 
         private async Task HandleMessageAsync(Update update)
         {
-            if (await TryGetCommandHandlerAsync(update.Message) is { } commandHandler)
+            var userId = update.GetTgUserId();
+            var lastActiveTransactionForUser =
+                _mapper.Map<TransactionModel>(await _transactionRepository.GetLastActiveTransactionByUserId(userId));
+            if (lastActiveTransactionForUser == null || update.Message.Text is "/cancel")
             {
-                // TODO: Create a command data set(maybe done with one more factory)
-                await commandHandler.HandleCommandAsync(update);
+                if (await TryGetCommandHandlerAsync(update.Message) is { } commandHandler)
+                {
+                    await commandHandler.HandleCommandAsync(update);
+                    return;
+                }
+            }
+
+            if (update.Message.Text.IsPossibleCommand())
+            {
+                await _botMessagesService.SendErrorAsync(userId, "You have uncompleted transactions." +
+                                                                 " To abort them use commend /cancel");
                 return;
             }
 
-            // TODO: Add more secure way to receive user's Id
-            var userId = update.Message.From.Id;
-
-            if ((await TryGetUpdateHandlerAsync(userId)) is { } updateHandler)
+            if ((await TryGetUpdateHandlerAsync(lastActiveTransactionForUser)) is { } updateHandler)
             {
                 await updateHandler.HandleUpdateAsync(update);
             }
@@ -80,22 +88,20 @@ namespace FileReceiver.Bl.Impl.Services
             }
         }
 
-        private async Task<IUpdateHandler> TryGetUpdateHandlerAsync(long userId)
+        private Task<IUpdateHandler> TryGetUpdateHandlerAsync(TransactionModel transaction)
         {
-            var lastActiveTransactionForUser = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
-            if (lastActiveTransactionForUser == null)
-            {
-                return null;
-            }
-
-            return _updateHandlerFactory.CreateUpdateHandler(
-                _mapper.Map<TransactionModel>(lastActiveTransactionForUser));
+            return Task.FromResult(_updateHandlerFactory.CreateUpdateHandler(transaction.TransactionType));
         }
 
         private Task<ICommandHandler> TryGetCommandHandlerAsync(Message message)
         {
-            // TODO: Add a command detection logic
-            return Task.FromResult(_commandHandlerFactory.CreateCommandHandler(message.Text.GetCommandFromMessage()));
+            if (message.Text.IsPossibleCommand())
+            {
+                return Task.FromResult(
+                    _commandHandlerFactory.CreateCommandHandler(message.Text.GetCommandFromMessage()));
+            }
+
+            return Task.FromResult<ICommandHandler>(null);
         }
     }
 }

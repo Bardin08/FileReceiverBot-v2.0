@@ -19,7 +19,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
 
         public async Task HandleCommandAsync(Update update)
         {
-            var userId = update.Message.From.Id;
+            var userId = update.GetTgUserId();
             await _botMessagesService.SendNotSupportedAsync(userId, update.Message.Text.GetCommandFromMessage());
         }
     }

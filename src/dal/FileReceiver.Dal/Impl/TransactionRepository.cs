@@ -47,8 +47,16 @@ namespace FileReceiver.Dal.Impl
         public async Task<TransactionEntity> GetLastActiveTransactionByUserId(long userId)
         {
             return await Context.Transactions
-                .SingleOrDefaultAsync(transaction => transaction.UserId == userId
+                .FirstOrDefaultAsync(transaction => transaction.UserId == userId
                                                      && transaction.TransactionState == TransactionStateDb.Active);
+        }
+
+        public async Task AbortAllTransactionsForUser(long userId)
+        {
+            var sql = $@"UPDATE ""Transactions"" AS T
+                       SET ""TransactionState"" = 'Aborted'
+                       WHERE T.""UserId"" = '{userId}' AND T.""TransactionState"" = 'Active'";
+            await Context.Database.ExecuteSqlRawAsync(sql);
         }
     }
 }
