@@ -13,7 +13,7 @@ namespace FileReceiver.Dal.Impl
         {
         }
 
-        public async Task<bool> CheckIfUserExists(long userId)
+        public async Task<bool> CheckIfUserExistsAsync(long userId)
         {
             return await Context.Users.AnyAsync(x => x.Id == userId);
         }

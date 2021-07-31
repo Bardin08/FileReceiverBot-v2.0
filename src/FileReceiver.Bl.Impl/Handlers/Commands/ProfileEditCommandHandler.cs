@@ -26,7 +26,7 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
         {
             var userId = update.GetTgUserId();
 
-            if (!await _userRepository.CheckIfUserExists(userId))
+            if (!await _userRepository.CheckIfUserExistsAsync(userId))
             {
                 await _botMessagesService.SendErrorAsync(userId,
                     "You should register before you can use this command, to do this you can use command /register");

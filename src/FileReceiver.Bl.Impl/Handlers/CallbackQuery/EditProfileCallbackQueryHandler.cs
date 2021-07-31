@@ -9,9 +9,6 @@ using FileReceiver.Common.Enums;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities;
-using FileReceiver.Dal.Entities.Enums;
-
-using Telegram.Bot.Types;
 
 namespace FileReceiver.Bl.Impl.Handlers.CallbackQuery
 {
@@ -21,19 +18,17 @@ namespace FileReceiver.Bl.Impl.Handlers.CallbackQuery
         private readonly IUserRegistrationService _userRegistrationService;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IMapper _mapper;
-        private readonly IUpdateHandlerFactory _updateHandlerFactory;
 
         public EditProfileCallbackQueryHandler(
             IBotMessagesService botMessagesService,
             IUserRegistrationService userRegistrationService,
             ITransactionRepository transactionRepository,
-            IMapper mapper, IUpdateHandlerFactory updateHandlerFactory)
+            IMapper mapper)
         {
             _botMessagesService = botMessagesService;
+            _userRegistrationService = userRegistrationService;
             _transactionRepository = transactionRepository;
             _mapper = mapper;
-            _updateHandlerFactory = updateHandlerFactory;
-            _userRegistrationService = userRegistrationService;
         }
 
         public async Task HandleCallback(Telegram.Bot.Types.CallbackQuery callbackQuery)

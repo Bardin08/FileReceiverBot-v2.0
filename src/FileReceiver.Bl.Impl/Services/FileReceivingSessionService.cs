@@ -37,7 +37,7 @@ namespace FileReceiver.Bl.Impl.Services
 
         public async Task CreateFileReceivingSessionAsync(long userId)
         {
-            if (!await _userRepository.CheckIfUserExists(userId))
+            if (!await _userRepository.CheckIfUserExistsAsync(userId))
             {
                 throw new UserProfileNotFoundException(userId, nameof(CreateFileReceivingSessionAsync));
             }
@@ -72,6 +72,10 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task SetFileSizeConstraintAsync(Guid sessionId, int bytes = 1000000)
         {
             var sessionEntity = await _receivingSessionRepository.GetByIdAsync(sessionId);
+            if (sessionEntity is null)
+            {
+                throw new FileReceivingSessionNotFound(sessionId);
+            }
 
             var session = _mapper.Map<FileReceivingSessionModel>(sessionEntity);
             session.Constrains.AddConstraint(ConstraintType.FileSize, bytes.ToString());
@@ -84,6 +88,10 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task SetFileNameConstraintAsync(Guid sessionId, string regexPatterns)
         {
             var sessionEntity = await _receivingSessionRepository.GetByIdAsync(sessionId);
+            if (sessionEntity is null)
+            {
+                throw new FileReceivingSessionNotFound(sessionId);
+            }
 
             var session = _mapper.Map<FileReceivingSessionModel>(sessionEntity);
             session.Constrains.AddConstraint(ConstraintType.FileName, regexPatterns);
@@ -96,6 +104,10 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task SetFileExtensionConstraintAsync(Guid sessionId, string extensions)
         {
             var sessionEntity = await _receivingSessionRepository.GetByIdAsync(sessionId);
+            if (sessionEntity is null)
+            {
+                throw new FileReceivingSessionNotFound(sessionId);
+            }
 
             var session = _mapper.Map<FileReceivingSessionModel>(sessionEntity);
             session.Constrains.AddConstraint(ConstraintType.FileExtension, extensions);
@@ -108,6 +120,11 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task SetSessionMaxFilesConstraintAsync(long userId, Guid sessionId, int amount = 50)
         {
             var sessionEntity = await _receivingSessionRepository.GetByIdAsync(sessionId);
+            if (sessionEntity is null)
+            {
+                throw new FileReceivingSessionNotFound(sessionId);
+            }
+
             sessionEntity.MaxFiles = amount;
             sessionEntity.SessionState = FileReceivingSessionStateDb.SetFilesStorage;
             await _receivingSessionRepository.UpdateAsync(sessionEntity);
@@ -144,18 +161,23 @@ namespace FileReceiver.Bl.Impl.Services
             sessionEntity.SessionState = FileReceivingSessionStateDb.EndedSession;
             sessionEntity.SessionEndReason = SessionEndReasonDb.EndedByOwner;
             await _receivingSessionRepository.UpdateAsync(sessionEntity);
-            await _botMessagesService.SendErrorAsync(userId, "Session stopped");
+            await _botMessagesService.SendTextMessageAsync(userId, "Session stopped");
         }
 
+        // TODO: Should be rewritten! Not safe at cases when session is not exists
         public async Task<FileReceivingSessionState> GetSessionStateAsync(Guid sessionId)
         {
             return (FileReceivingSessionState)(await _receivingSessionRepository.GetByIdAsync(sessionId)).SessionState;
         }
 
+        // TODO: Should be private and all sessionId receives should be done at this service
         public async Task<Guid?> GetFirstActiveFileReceivingSessionIdByUserIdAsync(long userId)
         {
             var transactionEntity = await _transactionRepository
                 .GetByUserIdAsync(userId, TransactionTypeDb.FileReceivingSessionCreating);
+
+            if (transactionEntity is null) return null;
+
             var transactionData = new TransactionDataModel(transactionEntity.TransactionData);
             return new Guid((string)transactionData.GetDataPiece(TransactionDataParameter.FileReceivingSessionId));
         }

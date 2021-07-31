@@ -1,11 +1,8 @@
-using System;
 using System.Threading.Tasks;
 
 using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Handlers;
-using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Enums;
-using FileReceiver.Common.Exceptions;
 
 using Telegram.Bot.Types;
 
@@ -13,17 +10,11 @@ namespace FileReceiver.Bl.Impl.Handlers.CallbackQuery
 {
     public class FileReceivingSessionCallbackQueryHandler : ICallbackQueryHandler
     {
-        private readonly IFileReceivingSessionService _receivingSessionService;
-        private readonly IBotMessagesService _botMessagesService;
         private readonly IUpdateHandlerFactory _updateHandlerFactory;
 
         public FileReceivingSessionCallbackQueryHandler(
-            IFileReceivingSessionService receivingSessionService,
-            IBotMessagesService botMessagesService,
             IUpdateHandlerFactory updateHandlerFactory)
         {
-            _receivingSessionService = receivingSessionService;
-            _botMessagesService = botMessagesService;
             _updateHandlerFactory = updateHandlerFactory;
         }
 

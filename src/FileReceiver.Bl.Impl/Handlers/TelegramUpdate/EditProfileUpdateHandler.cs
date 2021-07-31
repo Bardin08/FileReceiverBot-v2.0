@@ -17,17 +17,18 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 {
     public class EditProfileUpdateHandler : IUpdateHandler
     {
+        private readonly IBotMessagesService _botMessagesService;
         private readonly IUserRepository _userRepository;
         private readonly ITransactionRepository _transactionRepository;
-        private readonly IBotMessagesService _botMessagesService;
 
-        public EditProfileUpdateHandler(IUserRepository userRepository,
-            ITransactionRepository transactionRepository,
-            IBotMessagesService botMessagesService)
+        public EditProfileUpdateHandler(
+            IBotMessagesService botMessagesService,
+            IUserRepository userRepository,
+            ITransactionRepository transactionRepository)
         {
-            _transactionRepository = transactionRepository;
             _botMessagesService = botMessagesService;
             _userRepository = userRepository;
+            _transactionRepository = transactionRepository;
         }
 
         public async Task HandleUpdateAsync(Update update)

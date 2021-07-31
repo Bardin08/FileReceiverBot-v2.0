@@ -8,7 +8,7 @@ namespace FileReceiver.Common.Extensions
     {
         public static bool IsPossibleCommand(this string text)
         {
-            return text is not null && text.StartsWith('/');
+            return text is not null && text.StartsWith('/') && text.Length > 2;
         }
 
         public static string GetCommandFromMessage(this string text)
