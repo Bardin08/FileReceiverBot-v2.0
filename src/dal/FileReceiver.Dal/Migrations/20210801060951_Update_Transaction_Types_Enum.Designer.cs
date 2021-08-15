@@ -4,15 +4,17 @@ using FileReceiver.Dal;
 using FileReceiver.Dal.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FileReceiver.Dal.Migrations
 {
     [DbContext(typeof(FileReceiverDbContext))]
-    partial class FileReceiverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210801060951_Update_Transaction_Types_Enum")]
+    partial class Update_Transaction_Types_Enum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

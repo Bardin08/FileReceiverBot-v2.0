@@ -26,6 +26,7 @@ namespace FileReceiver.Bl.Impl.Factories
                 TransactionType.Registration => _serviceProvider.GetService<RegistrationUpdateHandler>(),
                 TransactionType.EditProfile => _serviceProvider.GetService<EditProfileUpdateHandler>(),
                 TransactionType.FileReceivingSessionCreating => _serviceProvider.GetService<FileReceivingSessionCreatingUpdateHandler>(),
+                TransactionType.FileSending => _serviceProvider.GetService<FileSendingUpdateHandler>(),
                 _ => _serviceProvider.GetService<DefaultUpdateHandler>(),
             };
         }

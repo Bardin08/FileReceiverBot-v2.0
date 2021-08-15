@@ -6,5 +6,6 @@ namespace FileReceiver.Dal.Entities.Enums
         Registration = 1,
         EditProfile = 2,
         FileReceivingSessionCreating = 3,
+        FileSending = 4,
     }
 }

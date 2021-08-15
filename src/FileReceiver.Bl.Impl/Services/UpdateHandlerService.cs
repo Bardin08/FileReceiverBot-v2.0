@@ -45,6 +45,9 @@ namespace FileReceiver.Bl.Impl.Services
                 case { Message: { Text: { } } }:
                     await HandleMessageAsync(update);
                     break;
+                case { Message: { Document: { } } or { Photo: { } } }:
+                    await HandleMessageAsync(update);
+                    break;
                 case { CallbackQuery: { Message: { Text: { } } } cb }:
                     await HandleCallbackQuery(cb);
                     break;

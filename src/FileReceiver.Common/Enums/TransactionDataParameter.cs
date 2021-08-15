@@ -6,5 +6,6 @@ namespace FileReceiver.Common.Enums
         RegistrationState = 1,
         ProfileEditingAction = 2,
         FileReceivingSessionId = 3,
+        FileReceivingState = 4,
     }
 }
