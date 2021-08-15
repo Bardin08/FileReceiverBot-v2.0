@@ -33,6 +33,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<IBotMessagesService, BotMessagesService>();
             services.AddTransient<IUserRegistrationService, UserRegistrationService>();
             services.AddTransient<IFileReceivingSessionService, FileReceivingSessionService>();
+            services.AddTransient<IFileReceivingService, FileReceivingService>();
         }
 
         private static void AddMapperConfiguration(this IServiceCollection services)
@@ -56,6 +57,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<ProfileCommandHandler, ProfileCommandHandler>();
             services.AddTransient<ProfileEditCommandHandler, ProfileEditCommandHandler>();
             services.AddTransient<StartReceivingCommandHandler, StartReceivingCommandHandler>();
+            services.AddTransient<SendFileCommandHandler, SendFileCommandHandler>();
         }
 
         private static void AddUpdateHandlers(this IServiceCollection services)
@@ -64,6 +66,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<DefaultUpdateHandler, DefaultUpdateHandler>();
             services.AddTransient<EditProfileUpdateHandler, EditProfileUpdateHandler>();
             services.AddTransient<FileReceivingSessionCreatingUpdateHandler, FileReceivingSessionCreatingUpdateHandler>();
+            services.AddTransient<FileSendingUpdateHandler, FileSendingUpdateHandler>();
         }
 
         private static void AddCallbackQueryHandlers(this IServiceCollection services)
