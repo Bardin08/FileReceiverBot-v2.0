@@ -1,15 +1,14 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
-
-using AutoMapper;
 
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Enums;
 using FileReceiver.Common.Exceptions;
-using FileReceiver.Common.Models;
 using FileReceiver.Dal.Abstract.Repositories;
-using FileReceiver.Dal.Entities.Enums;
+using FileReceiver.Integrations.Mega.Abstract;
 
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace FileReceiver.Bl.Impl.Services
@@ -17,75 +16,70 @@ namespace FileReceiver.Bl.Impl.Services
     public class FileReceivingService : IFileReceivingService
     {
         private readonly IBotMessagesService _botMessagesService;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IBotTransactionService _botTransactionService;
+        private readonly IBotTransactionService _transactionService;
         private readonly IFileReceivingSessionRepository _fileReceivingSessionRepository;
-        private readonly IMapper _mapper;
+        private readonly IMegaApiClient _megaClient;
+        private readonly ITelegramBotClient _botClient;
 
         public FileReceivingService(
             IBotMessagesService botMessagesService,
-            ITransactionRepository transactionRepository,
+            IBotTransactionService botTransactionService,
+            IBotTransactionService transactionService,
             IFileReceivingSessionRepository fileReceivingSessionRepository,
-            IMapper mapper)
+            IMegaApiClient megaClient,
+            ITelegramBotClient botClient)
         {
             _botMessagesService = botMessagesService;
-            _transactionRepository = transactionRepository;
+            _botTransactionService = botTransactionService;
+            _transactionService = transactionService;
             _fileReceivingSessionRepository = fileReceivingSessionRepository;
-            _mapper = mapper;
+            _megaClient = megaClient;
+            _botClient = botClient;
         }
 
         public async Task UpdateFileReceivingState(long userId, FileReceivingState newState)
         {
-            var transactionEntity = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
+            var transaction = await _transactionService.Get(userId, TransactionType.FileSending);
 
-            if (transactionEntity.TransactionType is not TransactionTypeDb.FileSending)
-            {
-                throw new InvalidTransactionTypeException();
-            }
+            transaction.TransactionData.UpdateParameter(TransactionDataParameter.FileReceivingState, newState);
 
-            var transactionData = new TransactionDataModel(transactionEntity.TransactionData);
-            transactionData.UpdateParameter(TransactionDataParameter.FileReceivingState, newState);
-            transactionEntity.TransactionData = transactionData.ParametersAsJson;
-
-            await _transactionRepository.UpdateAsync(transactionEntity);
+            await _transactionService.Update(transaction);
         }
 
         public async Task FinishReceivingTransaction(long userId)
         {
-            var transactionEntity = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
-            if (transactionEntity.TransactionType is not TransactionTypeDb.FileSending)
-            {
-                return;
-            }
-
-            transactionEntity.TransactionState = TransactionStateDb.Committed;
-            await _transactionRepository.UpdateAsync(transactionEntity);
+            await _transactionService.UpdateState(userId, TransactionType.FileSending, TransactionState.Committed);
         }
 
-        public async Task<bool> SaveDocument(Document document)
+        public async Task<bool> SaveDocument(long userId, Guid sessionId, Document document)
         {
-            // TODO: Add saving the document to the datasource
-            await Task.Delay(5000);
-            return true;
-        }
+            // TODO: Add constraints check
+            var transaction = await _transactionService.Get(userId, TransactionType.FileSending);
+            var memStream = new MemoryStream();
+            var fileInfo = await _botClient.GetFileAsync(document.FileId);
+            await _botClient.DownloadFileAsync(fileInfo.FilePath, memStream);
+            var megaResponse = await _megaClient.UploadFile(
+                transaction.Id,
+                sessionId.ToString(),
+                document.FileName,
+                memStream);
 
-        public async Task<bool> SavePhoto(PhotoSize photoSize)
-        {
-            // TODO: Add saving the photo to the datasource
-            await Task.Delay(5000);
-            return true;
+            return megaResponse.Successful;
         }
 
         public async Task<FileReceivingState> GetFileReceivingStateForUser(long userId)
         {
             try
             {
-                var transaction = await GetTransactionAndNotifyIfItsTypeInvalid(userId);
+                var transaction = await _botTransactionService.Get(userId, TransactionType.FileSending);
 
                 return transaction.TransactionData.GetDataPiece<FileReceivingState>(
                     TransactionDataParameter.FileReceivingState);
             }
             catch (InvalidTransactionTypeException)
             {
+                // TODO: Log exception
                 await _botMessagesService.SendErrorAsync(userId, "An error occured while processing you input. " +
                                                                  "Try to use command /cancel and then start " +
                                                                  "a file sending process again");
@@ -97,19 +91,6 @@ namespace FileReceiver.Bl.Impl.Services
         {
             var session = await _fileReceivingSessionRepository.GetByIdAsync(token);
             return session is not null;
-        }
-
-        // TODO: maybe create a separate service for actioning with transactions?
-        private async Task<TransactionModel> GetTransactionAndNotifyIfItsTypeInvalid(long userId)
-        {
-            var transaction = _mapper.Map<TransactionModel>(
-                await _transactionRepository.GetLastActiveTransactionByUserId(userId));
-            if (transaction.TransactionType is not TransactionType.FileSending)
-            {
-                throw new InvalidTransactionTypeException();
-            }
-
-            return transaction;
         }
     }
 }

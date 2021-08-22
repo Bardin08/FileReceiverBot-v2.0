@@ -5,15 +5,12 @@ using Bogus;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Entities;
 using FileReceiver.Dal.Entities.Enums;
-using FileReceiver.Tests.Bl.Constants;
+using FileReceiver.Tests.Fakers.Configurations;
 
-namespace FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers
+namespace FileReceiver.Tests.Fakers.EntityFakers
 {
-    internal static class FileReceiverSessionEntityFaker
+    public static class FileReceiverSessionEntityFaker
     {
-        private const int MinFilesPerSession = 10;
-        private const int MaxFilesPerSession = 100;
-
         internal static Faker<FileReceivingSessionEntity> GetFileReceiverSessionEntityFaker(
             int seed = FakersConstants.FakersSeed)
         {
@@ -24,20 +21,20 @@ namespace FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers
                 .RuleFor(x => x.UserId, user.Id)
                 .RuleFor(x => x.User, user)
                 .RuleFor(x => x.SessionState, x => x.PickRandom<FileReceivingSessionStateDb>())
-                .RuleFor(x => x.FilesReceived, x => x.Random.Int(MinFilesPerSession, MaxFilesPerSession))
-                .RuleFor(x => x.MaxFiles, x => x.Random.Int(MinFilesPerSession, MaxFilesPerSession))
+                .RuleFor(x => x.FilesReceived, x => x.Random.Int(FakersConstants.MinFilesPerSession, FakersConstants.MaxFilesPerSession))
+                .RuleFor(x => x.MaxFiles, x => x.Random.Int(FakersConstants.MinFilesPerSession, FakersConstants.MaxFilesPerSession))
                 .RuleFor(x => x.Storage, x => x.PickRandom<FileStorageTypeDb>())
                 .RuleFor(x => x.Constrains, new ConstraintsModel().ConstraintsAsJson)
                 .RuleFor(x => x.CreateData, x => x.Date.Past());
         }
 
-        internal static FileReceivingSessionEntity GenerateFileReceivingSessionEntityWithRandomState(
+        public static FileReceivingSessionEntity GenerateFileReceivingSessionEntityWithRandomState(
             int seed = FakersConstants.FakersSeed)
         {
             return GetFileReceiverSessionEntityFaker(seed).Generate();
         }
 
-        internal static FileReceivingSessionEntity GenerateForCreateSessionMethod(int seed = FakersConstants.FakersSeed)
+        public static FileReceivingSessionEntity GenerateForCreateSessionMethod(int seed = FakersConstants.FakersSeed)
         {
             return GetFileReceiverSessionEntityFaker(seed)
                 .RuleFor(x => x.SessionState, FileReceivingSessionStateDb.FileSizeConstraintSet)
@@ -46,7 +43,7 @@ namespace FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers
                 .Generate();
         }
 
-        internal static FileReceivingSessionEntity GenerateForSetConstraintMethods(int seed = FakersConstants.FakersSeed)
+        public static FileReceivingSessionEntity GenerateForSetConstraintMethods(int seed = FakersConstants.FakersSeed)
         {
             return GetFileReceiverSessionEntityFaker(seed)
                 .RuleFor(x => x.SessionState, FileReceivingSessionStateDb.FileSizeConstraintSet)

@@ -17,22 +17,27 @@ namespace FileReceiver.Bl.Impl.Services
     {
         private readonly IBotMessagesService _botMessagesService;
         private readonly IUserRepository _userRepository;
-        private readonly ITransactionRepository _transactionRepository;
+        private readonly IBotTransactionService _transactionService;
         private readonly IFileReceivingSessionRepository _receivingSessionRepository;
         private readonly IMapper _mapper;
 
         public FileReceivingSessionService(
             IBotMessagesService botMessagesService,
             IUserRepository userRepository,
-            ITransactionRepository transactionRepository,
+            IBotTransactionService transactionService,
             IFileReceivingSessionRepository receivingSessionRepository,
             IMapper mapper)
         {
             _botMessagesService = botMessagesService;
             _userRepository = userRepository;
-            _transactionRepository = transactionRepository;
             _receivingSessionRepository = receivingSessionRepository;
             _mapper = mapper;
+            _transactionService = transactionService;
+        }
+
+        public async Task<Guid> GetId(long userId)
+        {
+            return await GetSessionIdAndThrowExceptionIfNotExists(userId, nameof(GetId));
         }
 
         public async Task CreateFileReceivingSessionAsync(long userId)
@@ -66,7 +71,7 @@ namespace FileReceiver.Bl.Impl.Services
                 TransactionData = transactionDataModel,
             };
 
-            await _transactionRepository.AddAsync(_mapper.Map<TransactionEntity>(transaction));
+            await _transactionService.Add(transaction);
         }
 
         public async Task SetFileSizeConstraintAsync(Guid sessionId, int bytes = 1000000)
@@ -142,57 +147,66 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task<string> ExecuteSessionAsync(long userId)
         {
             var sessionId = await GetSessionIdAndThrowExceptionIfNotExists(userId, nameof(ExecuteSessionAsync));
+
             var sessionEntity = await _receivingSessionRepository.GetByIdAsync(sessionId);
+            if (sessionEntity.SessionState is FileReceivingSessionStateDb.ActiveSession)
+            {
+                return sessionEntity.Id.ToString();
+            }
+
             sessionEntity.SessionState = FileReceivingSessionStateDb.ActiveSession;
             await _receivingSessionRepository.UpdateAsync(sessionEntity);
-
             return sessionEntity.Id.ToString();
         }
 
         public async Task StopSessionAsync(long userId)
         {
             var sessionId = await GetSessionIdAndThrowExceptionIfNotExists(userId, nameof(StopSessionAsync));
+
             var sessionEntity = await _receivingSessionRepository.GetByIdAsync(sessionId);
+            if (sessionEntity is null)
+            {
+                throw new FileReceivingSessionNotFound(sessionId, "Session not found!");
+            }
+
             if (sessionEntity.UserId != userId)
             {
                 await _botMessagesService.SendErrorAsync(userId, "You can stop only yours sessions");
                 return;
             }
+
             sessionEntity.SessionState = FileReceivingSessionStateDb.EndedSession;
             sessionEntity.SessionEndReason = SessionEndReasonDb.EndedByOwner;
+
             await _receivingSessionRepository.UpdateAsync(sessionEntity);
             await _botMessagesService.SendTextMessageAsync(userId, "Session stopped");
         }
 
-        // TODO: Should be rewritten! Not safe at cases when session is not exists
         public async Task<FileReceivingSessionState> GetSessionStateAsync(Guid sessionId)
         {
-            return (FileReceivingSessionState)(await _receivingSessionRepository.GetByIdAsync(sessionId)).SessionState;
-        }
+            var session = (await _receivingSessionRepository.GetByIdAsync(sessionId));
+            if (session is null)
+            {
+                throw new FileReceivingSessionNotFound(sessionId, "Session not found!");
+            }
 
-        // TODO: Should be private and all sessionId receives should be done at this service
-        public async Task<Guid?> GetFirstActiveFileReceivingSessionIdByUserIdAsync(long userId)
-        {
-            var transactionEntity = await _transactionRepository
-                .GetByUserIdAsync(userId, TransactionTypeDb.FileReceivingSessionCreating);
-
-            if (transactionEntity is null) return null;
-
-            var transactionData = new TransactionDataModel(transactionEntity.TransactionData);
-            return new Guid((string)transactionData.GetDataPiece(TransactionDataParameter.FileReceivingSessionId));
+            return (FileReceivingSessionState)session.SessionState;
         }
 
         private async Task<Guid> GetSessionIdAndThrowExceptionIfNotExists(long userId, string actionName)
         {
-            var sessionId = await GetFirstActiveFileReceivingSessionIdByUserIdAsync(userId);
-            if (sessionId.HasValue)
+            try
             {
-                return sessionId.Value;
+                var transaction = await _transactionService.Get(userId, TransactionType.FileReceivingSessionCreating);
+                return new Guid((string)transaction.TransactionData.GetDataPiece(
+                    TransactionDataParameter.FileReceivingSessionId));
             }
-
-            await _botMessagesService.SendErrorAsync(userId,
-                "Session wasn't found. Use command /cancel and then /start_receiving to create a new one");
-            throw new FileReceivingSessionActionErrorException(userId, actionName);
+            catch (Exception ex)
+            {
+                await _botMessagesService.SendErrorAsync(userId,
+                    "Session wasn't found. Use command /cancel and then /start_receiving to create a new one");
+                throw new FileReceivingSessionActionErrorException(userId, actionName, ex);
+            }
         }
     }
 }

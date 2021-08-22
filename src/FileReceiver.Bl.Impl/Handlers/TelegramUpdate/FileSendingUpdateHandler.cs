@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using FileReceiver.Bl.Abstract.Handlers;
@@ -15,13 +14,15 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
     {
         private readonly IFileReceivingService _fileReceivingService;
         private readonly IBotMessagesService _botMessagesService;
+        private readonly IBotTransactionService _transactionService;
 
         public FileSendingUpdateHandler(
             IFileReceivingService fileReceivingService,
-            IBotMessagesService botMessagesService)
+            IBotMessagesService botMessagesService, IBotTransactionService transactionService)
         {
             _fileReceivingService = fileReceivingService;
             _botMessagesService = botMessagesService;
+            _transactionService = transactionService;
         }
 
         public async Task HandleUpdateAsync(Update update)
@@ -60,12 +61,16 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
             await _fileReceivingService.UpdateFileReceivingState(data.UserId, FileReceivingState.FileReceived);
         }
 
-
         private async Task HandleReceivedFile(FileSendingUpdateData data)
         {
+            var transaction = await _transactionService.Get(data.UserId, TransactionType.FileSending);
             if (data.Update.Message.Document is not null)
             {
-                var isDocumentSaved = await _fileReceivingService.SaveDocument(data.Update.Message.Document);
+                var isDocumentSaved = await _fileReceivingService.SaveDocument(
+                    data.UserId,
+                    new Guid(transaction.TransactionData.GetDataPiece(
+                        TransactionDataParameter.FileReceivingSessionId).ToString() ?? Guid.Empty.ToString()),
+                    data.Update.Message.Document);
 
                 if (!isDocumentSaved)
                 {
@@ -77,15 +82,8 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 
             if (data.Update.Message.Photo is not null)
             {
-                // Telegram always returns 4 photos. The last one is in original quality
-                var isPhotoSaved = await _fileReceivingService.SavePhoto(data.Update.Message.Photo.Last());
-
-                if (!isPhotoSaved)
-                {
-                    await _botMessagesService.SendErrorAsync(data.UserId,
-                        "An error occured while photo saving. Try again");
-                    return;
-                }
+                await _botMessagesService.SendNotSupportedAsync(data.UserId, "Currently photos saving is not supported. " +
+                                                                             "You can save photo as a document");
             }
 
             await _botMessagesService.SendTextMessageAsync(data.UserId, "Your file saved");
@@ -103,13 +101,16 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 return false;
             }
 
-            if (!await _fileReceivingService.CheckIfSessionExists(token))
+            if (await _fileReceivingService.CheckIfSessionExists(token))
             {
-                await _botMessagesService.SendErrorAsync(data.UserId, "Session with this token is not exists");
-                return false;
+                var transaction = await _transactionService.Get(data.UserId, TransactionType.FileSending);
+                transaction.TransactionData.AddDataPiece(TransactionDataParameter.FileReceivingSessionId, token);
+                await _transactionService.Update(transaction);
+                return true;
             }
 
-            return true;
+            await _botMessagesService.SendErrorAsync(data.UserId, "Session with this token is not exists");
+            return false;
         }
 
         private class FileSendingUpdateData

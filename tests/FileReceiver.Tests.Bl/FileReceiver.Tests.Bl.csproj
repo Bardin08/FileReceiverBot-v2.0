@@ -25,6 +25,11 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\FileReceiver.Bl.Abstract\FileReceiver.Bl.Abstract.csproj" />
       <ProjectReference Include="..\..\src\FileReceiver.Bl.Impl\FileReceiver.Bl.Impl.csproj" />
+      <ProjectReference Include="..\FileReceiver.Tests.Fakers\FileReceiver.Tests.Fakers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Constants" />
     </ItemGroup>
 
 </Project>

@@ -34,6 +34,7 @@ namespace FileReceiver.Bl.Impl
             services.AddTransient<IUserRegistrationService, UserRegistrationService>();
             services.AddTransient<IFileReceivingSessionService, FileReceivingSessionService>();
             services.AddTransient<IFileReceivingService, FileReceivingService>();
+            services.AddTransient<IBotTransactionService, BotTransactionService>();
         }
 
         private static void AddMapperConfiguration(this IServiceCollection services)
