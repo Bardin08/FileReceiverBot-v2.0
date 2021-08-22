@@ -1,13 +1,12 @@
 using System;
 
-using AutoMapper;
-
 using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl.Factories;
 using FileReceiver.Bl.Impl.Handlers.TelegramUpdate;
 using FileReceiver.Common.Enums;
 using FileReceiver.Dal.Abstract.Repositories;
+using FileReceiver.Integrations.Mega.Abstract;
 
 using FluentAssertions;
 
@@ -34,6 +33,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         private readonly ITransactionRepository _transactionRepository = Substitute.For<ITransactionRepository>();
 
         private readonly ITelegramBotClient _botClient = Substitute.For<ITelegramBotClient>();
+        private readonly IMegaApiClient _megaApiClient = Substitute.For<IMegaApiClient>();
 
         public UpdateHandlerFactoryTests()
         {
@@ -88,7 +88,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         {
             // Arrange
             var updateHandler = new FileReceivingSessionCreatingUpdateHandler(_botMessagesService,
-                _receivingSessionService, _botClient);
+                _receivingSessionService, _botClient, _megaApiClient);
             _serviceProvider.GetService<FileReceivingSessionCreatingUpdateHandler>().Returns(updateHandler);
 
             // Act

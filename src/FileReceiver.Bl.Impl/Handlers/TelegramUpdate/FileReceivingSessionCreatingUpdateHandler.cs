@@ -6,6 +6,7 @@ using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Enums;
 using FileReceiver.Common.Exceptions;
 using FileReceiver.Common.Extensions;
+using FileReceiver.Integrations.Mega.Abstract;
 
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -19,67 +20,77 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         private readonly IBotMessagesService _botMessagesService;
         private readonly IFileReceivingSessionService _receivingSessionService;
         private readonly ITelegramBotClient _botClient;
+        private readonly IMegaApiClient _megaClient;
 
         public FileReceivingSessionCreatingUpdateHandler(
             IBotMessagesService botMessagesService,
             IFileReceivingSessionService receivingSessionService,
-            ITelegramBotClient botClient)
+            ITelegramBotClient botClient,
+            IMegaApiClient megaClient)
         {
             _botMessagesService = botMessagesService;
             _receivingSessionService = receivingSessionService;
             _botClient = botClient;
+            _megaClient = megaClient;
         }
 
         public async Task HandleUpdateAsync(Update update)
         {
             var userId = update.GetTgUserId();
-            var sessionId = await _receivingSessionService
-                .GetFirstActiveFileReceivingSessionIdByUserIdAsync(userId);
-            if (!sessionId.HasValue)
+
+            try
             {
+                var sessionId = await _receivingSessionService.GetId(userId);
+                var sessionState = await _receivingSessionService.GetSessionStateAsync(sessionId);
+
+                var data = new FileReceivingSessionDataDto()
+                {
+                    UserId = userId,
+                    SessionId = sessionId,
+                    Update = update,
+                };
+
+                // TODO: rewrite with pattern matching
+                switch (sessionState)
+                {
+                    case FileReceivingSessionState.FileSizeConstraintSet:
+                        await SetFileSizeConstraintAsync(data);
+                        break;
+                    case FileReceivingSessionState.FileNameConstraintSet:
+                        await SetFileNameConstraintAsync(data);
+                        break;
+                    case FileReceivingSessionState.FileExtensionConstraintSet:
+                        await SetFileExtensionsConstraintAsync(data);
+                        break;
+                    case FileReceivingSessionState.SessionMaxFilesConstraint:
+                        await SetSessionMaxFilesConstraintAsync(data);
+                        break;
+                    case FileReceivingSessionState.SetFilesStorage:
+                        await SetFileStorageAsync(data);
+                        break;
+                    case FileReceivingSessionState.ActiveSession:
+                        await ExecuteFileReceivingSessionAsync(data.UserId);
+                        break;
+                    case FileReceivingSessionState.EndedSession:
+                        await _botMessagesService.SendTextMessageAsync(data.UserId, "This session ended");
+                        break;
+                    default:
+                        await _botMessagesService.SendErrorAsync(userId,
+                            "Invalid action. Use command /cancel and then /start_receiving to recreate session");
+                        break;
+                }
+            }
+            catch (FileReceivingSessionNotFound)
+            {
+                // TODO: log exception
                 await _botMessagesService.SendErrorAsync(userId, "All your sessions are configured and executed now. " +
                                                                  "To check the list of active file receiving sessions " +
                                                                  "use command /active_sessions");
-                return;
             }
-
-            var sessionState = await _receivingSessionService.GetSessionStateAsync(sessionId.Value);
-
-            var data = new FileReceivingSessionDataDto()
+            catch (Exception ex)
             {
-                UserId = userId,
-                SessionId = sessionId.Value,
-                Update = update,
-            };
-
-            // TODO: rewrite with pattern matching
-            switch (sessionState)
-            {
-                case FileReceivingSessionState.FileSizeConstraintSet:
-                    await SetFileSizeConstraintAsync(data);
-                    break;
-                case FileReceivingSessionState.FileNameConstraintSet:
-                    await SetFileNameConstraintAsync(data);
-                    break;
-                case FileReceivingSessionState.FileExtensionConstraintSet:
-                    await SetFileExtensionsConstraintAsync(data);
-                    break;
-                case FileReceivingSessionState.SessionMaxFilesConstraint:
-                    await SetSessionMaxFilesConstraintAsync(data);
-                    break;
-                case FileReceivingSessionState.SetFilesStorage:
-                    await SetFileStorageAsync(data);
-                    break;
-                case FileReceivingSessionState.ActiveSession:
-                    await ExecuteFileReceivingSessionAsync(data.UserId);
-                    break;
-                case FileReceivingSessionState.EndedSession:
-                    await _botMessagesService.SendTextMessageAsync(data.UserId, "This session ended");
-                    break;
-                default:
-                    await _botMessagesService.SendErrorAsync(userId,
-                        "Invalid action. Use command /cancel and then /start_receiving to recreate session");
-                    break;
+                // TODO: log exception
+                await _botMessagesService.SendErrorAsync(userId, ex.Message);
             }
         }
 
@@ -218,11 +229,15 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 {
                     await _botMessagesService.SendTextMessageAsync(userId,
                         "Okay, this operation may take some time. I need to create all the required infrastructure");
-                    await _botClient.SendChatActionAsync(userId, ChatAction.FindLocation);
+                    await _botClient.SendChatActionAsync(userId, ChatAction.Typing);
+
                     var sessionId = await _receivingSessionService.ExecuteSessionAsync(userId);
-                    await Task.Delay(7000);
-                    // TODO: Remove delay
-                    await _botMessagesService.SendTextMessageAsync(userId, $"Great. Your session id is: `{sessionId}`");
+
+                    var clientResponse = await _megaClient.CreateFolder(Guid.Empty, sessionId);
+                    await _botMessagesService.SendTextMessageAsync(userId,
+                        $"Great. Your session id is: `{sessionId}` " +
+                        "and your files are located at " +
+                        $"{clientResponse.ActionDetails.NodeLink}");
                 }
                 catch (FileReceivingSessionActionErrorException ex)
                 {

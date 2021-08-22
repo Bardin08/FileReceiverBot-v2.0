@@ -14,9 +14,8 @@ using FileReceiver.Common.Exceptions;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Dal.Entities;
-using FileReceiver.Dal.Entities.Enums;
-using FileReceiver.Tests.Bl.Constants;
-using FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers;
+using FileReceiver.Tests.Fakers.EntityFakers;
+using FileReceiver.Tests.Fakers.ModelsFakers;
 
 using FluentAssertions;
 
@@ -31,9 +30,9 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         private readonly IFileReceivingSessionService _sut;
 
         private readonly IBotMessagesService _botMessagesService = Substitute.For<IBotMessagesService>();
+        private readonly IBotTransactionService _transactionService = Substitute.For<IBotTransactionService>();
 
         private readonly IUserRepository _userRepository = Substitute.For<IUserRepository>();
-        private readonly ITransactionRepository _transactionRepository = Substitute.For<ITransactionRepository>();
 
         private readonly IFileReceivingSessionRepository _receivingSessionRepository =
             Substitute.For<IFileReceivingSessionRepository>();
@@ -57,7 +56,7 @@ namespace FileReceiver.Tests.Bl.ServicesTests
             _sut = new FileReceivingSessionService(
                 _botMessagesService,
                 _userRepository,
-                _transactionRepository,
+                _transactionService,
                 _receivingSessionRepository,
                 _mapper);
         }
@@ -67,15 +66,15 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForCreateSessionMethod();
-            var transactionEnt = TransactionEntityFaker.GenerateNewFileSessionTransactionEntity(
-                sessionEnt.User);
+            var transaction = TransactionModelFaker.GenerateNewFileSessionTransactionModel(sessionEnt.UserId);
+            var transactionEnt = TransactionEntityFaker.GenerateNewFileSessionTransactionEntity(sessionEnt.User);
             var userEnt = sessionEnt.User;
 
             _userRepository.CheckIfUserExistsAsync(Arg.Any<long>()).Returns(true);
             _mapper.Map<FileReceivingSessionEntity>(Arg.Any<FileReceivingSessionModel>()).Returns(sessionEnt);
             _mapper.Map<TransactionEntity>(Arg.Any<TransactionModel>()).Returns(transactionEnt);
             _receivingSessionRepository.AddAsync(sessionEnt).Returns(sessionEnt);
-            _transactionRepository.AddAsync(transactionEnt).Returns(transactionEnt);
+            _transactionService.Add(transaction).Returns(transaction);
 
             // Act
             await _sut.CreateFileReceivingSessionAsync(userEnt.Id);
@@ -84,15 +83,14 @@ namespace FileReceiver.Tests.Bl.ServicesTests
             await _userRepository.Received(1).CheckIfUserExistsAsync(userEnt.Id);
             _mapper.Received(1).Map<FileReceivingSessionEntity>(Arg.Any<FileReceivingSessionModel>());
             await _receivingSessionRepository.Received(1).AddAsync(Arg.Any<FileReceivingSessionEntity>());
-            _mapper.Received(1).Map<TransactionEntity>(Arg.Any<TransactionModel>());
-            await _transactionRepository.Received(1).AddAsync(Arg.Any<TransactionEntity>());
+            await _transactionService.Received(1).Add(Arg.Any<TransactionModel>());
         }
 
         [Fact]
         public async Task CreateFileReceivingSessionAsync_ShouldReturnAnException_WhenUserWithGivenIdIsNotExists()
         {
             // Arrange
-            var userEnt = UserEntityFaker.GenerateUser();
+            var userEnt = UserModelFaker.GenerateUserModel();
             _userRepository.CheckIfUserExistsAsync(Arg.Any<long>()).Returns(false);
 
             // Act
@@ -252,13 +250,13 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
-            var transactionEnt = TransactionEntityFaker
-                .GenerateTransactionEntityWithFileReceivingSessionId(sessionEnt.User, sessionEnt);
+            var session = FileReceiverSessionModelFaker.GenerateFileReceivingSessionModel();
+            var transaction = TransactionModelFaker.GenerateTransactionEntityWithFileReceivingSessionId(
+                session.UserId, sessionEnt.Id);
 
             _receivingSessionRepository.GetByIdAsync(Arg.Any<Guid>()).Returns(sessionEnt);
             _receivingSessionRepository.UpdateAsync(Arg.Any<FileReceivingSessionEntity>()).Returns(Task.CompletedTask);
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(transactionEnt);
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating).Returns(transaction);
 
             // Act
             await _sut.SetFilesStorageAsync(sessionEnt.User.Id, FileStorageType.None);
@@ -273,8 +271,8 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(Task.FromResult<TransactionEntity>(null));
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating)
+                .Returns(Task.FromResult<TransactionModel>(null));
 
             // Act
             Func<Task> setStorage = async () => await _sut.SetFilesStorageAsync(sessionEnt.User.Id, FileStorageType.None);
@@ -292,13 +290,14 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
-            var transactionEnt = TransactionEntityFaker
-                .GenerateTransactionEntityWithFileReceivingSessionId(sessionEnt.User, sessionEnt);
+            var session = FileReceiverSessionModelFaker.GenerateFileReceivingSessionModel();
+            var transaction = TransactionModelFaker
+                .GenerateTransactionEntityWithFileReceivingSessionId(session.UserId, sessionEnt.Id);
 
             _receivingSessionRepository.GetByIdAsync(Arg.Any<Guid>()).Returns(sessionEnt);
             _receivingSessionRepository.UpdateAsync(Arg.Any<FileReceivingSessionEntity>()).Returns(Task.CompletedTask);
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(transactionEnt);
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating)
+                .Returns(transaction);
 
             // Act
             var sessionIdFromMethod = await _sut.ExecuteSessionAsync(sessionEnt.User.Id);
@@ -315,8 +314,8 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(Task.FromResult<TransactionEntity>(null));
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating)
+                .Returns(Task.FromResult<TransactionModel>(null));
 
             // Act
             Func<Task> setStorage = async () => await _sut.ExecuteSessionAsync(sessionEnt.User.Id);
@@ -334,13 +333,14 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
-            var transactionEnt = TransactionEntityFaker
-                .GenerateTransactionEntityWithFileReceivingSessionId(sessionEnt.User, sessionEnt);
+            var session = FileReceiverSessionModelFaker.GenerateFileReceivingSessionModel();
+            var transaction = TransactionModelFaker
+                .GenerateTransactionEntityWithFileReceivingSessionId(session.UserId, sessionEnt.Id);
 
             _receivingSessionRepository.GetByIdAsync(Arg.Any<Guid>()).Returns(sessionEnt);
             _receivingSessionRepository.UpdateAsync(Arg.Any<FileReceivingSessionEntity>()).Returns(Task.CompletedTask);
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(transactionEnt);
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating)
+                .Returns(transaction);
 
             // Act
             await _sut.StopSessionAsync(sessionEnt.User.Id);
@@ -357,13 +357,14 @@ namespace FileReceiver.Tests.Bl.ServicesTests
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
             var userId = sessionEnt.UserId + 1;
-            var transactionEnt = TransactionEntityFaker
-                .GenerateTransactionEntityWithFileReceivingSessionId(sessionEnt.User, sessionEnt);
+            var session = FileReceiverSessionModelFaker.GenerateFileReceivingSessionModel();
+            var transaction = TransactionModelFaker
+                .GenerateTransactionEntityWithFileReceivingSessionId(session.UserId, sessionEnt.Id);
 
             _receivingSessionRepository.GetByIdAsync(Arg.Any<Guid>()).Returns(sessionEnt);
             _receivingSessionRepository.UpdateAsync(Arg.Any<FileReceivingSessionEntity>()).Returns(Task.CompletedTask);
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(transactionEnt);
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating)
+                .Returns(transaction);
 
             // Act
             await _sut.StopSessionAsync(userId);
@@ -378,8 +379,8 @@ namespace FileReceiver.Tests.Bl.ServicesTests
         {
             // Arrange
             var sessionEnt = FileReceiverSessionEntityFaker.GenerateForSetConstraintMethods();
-            _transactionRepository.GetByUserIdAsync(Arg.Any<long>(), TransactionTypeDb.FileReceivingSessionCreating)
-                .Returns(Task.FromResult<TransactionEntity>(null));
+            _transactionService.Get(Arg.Any<long>(), TransactionType.FileReceivingSessionCreating)
+                .Returns(Task.FromResult<TransactionModel>(null));
 
             // Act
             Func<Task> setStorage = async () => await _sut.StopSessionAsync(sessionEnt.User.Id);

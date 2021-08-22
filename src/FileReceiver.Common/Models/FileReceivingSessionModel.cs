@@ -14,6 +14,7 @@ namespace FileReceiver.Common.Models
         public FileReceivingSessionState SessionState { get; set; }
         public int FilesReceived { get; set; }
         public int MaxFiles { get; set; }
+        public FileStorageType Storage { get; set; }
 
         public ConstraintsModel Constrains { get; set; }
 
@@ -21,6 +22,5 @@ namespace FileReceiver.Common.Models
         public DateTimeOffset? EndDate { get; set; }
 
         public SessionEndReason? SessionEndReason { get; set; }
-
     }
 }

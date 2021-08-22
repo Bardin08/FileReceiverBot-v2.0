@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Bogus" Version="33.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\dal\FileReceiver.Dal.Entities\FileReceiver.Dal.Entities.csproj" />
+      <ProjectReference Include="..\..\src\FileReceiver.Common\FileReceiver.Common.csproj" />
+    </ItemGroup>
+
+</Project>

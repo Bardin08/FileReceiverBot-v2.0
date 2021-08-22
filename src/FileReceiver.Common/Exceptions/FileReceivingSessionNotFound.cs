@@ -5,10 +5,12 @@ namespace FileReceiver.Common.Exceptions
 {
     public class FileReceivingSessionNotFound : Exception
     {
-        public Guid DesiredSessionId { get; private set; }
+        public Guid DesiredSessionId { get; }
 
-        public FileReceivingSessionNotFound(Guid desiredSessionId, string? message = "", Exception? innerException = null)
-            : base(message, innerException)
+        public FileReceivingSessionNotFound(
+            Guid desiredSessionId,
+            string? message = "",
+            Exception? innerException = null) : base(message, innerException)
         {
             DesiredSessionId = desiredSessionId;
         }

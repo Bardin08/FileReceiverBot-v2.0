@@ -3,6 +3,7 @@ using FileReceiver.Bl.Impl;
 using FileReceiver.Bl.Impl.HostedServices;
 using FileReceiver.Bl.Impl.Services;
 using FileReceiver.Dal;
+using FileReceiver.Integrations.Mega;
 
 using FileReceiverBot.Api.Configuration;
 
@@ -45,6 +46,7 @@ namespace FileReceiverBot.Api
             services.AddTransient<ITelegramBotClient>(_ => new TelegramBotClient(Configuration["BotSettings:Token"]));
             services.AddBl();
             services.AddDb(Configuration);
+            services.AddMega(Configuration);
 
             if (bool.Parse(Configuration["BotSettings:UseLongPolling"]))
             {

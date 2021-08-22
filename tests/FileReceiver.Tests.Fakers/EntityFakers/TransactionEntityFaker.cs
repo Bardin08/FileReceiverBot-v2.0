@@ -6,11 +6,11 @@ using FileReceiver.Common.Enums;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Entities;
 using FileReceiver.Dal.Entities.Enums;
-using FileReceiver.Tests.Bl.Constants;
+using FileReceiver.Tests.Fakers.Configurations;
 
-namespace FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers
+namespace FileReceiver.Tests.Fakers.EntityFakers
 {
-    internal static class TransactionEntityFaker
+    public static class TransactionEntityFaker
     {
         internal static Faker<TransactionEntity> GetTransactionEntityFaker(int seed = FakersConstants.FakersSeed)
         {
@@ -25,7 +25,7 @@ namespace FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers
                 .RuleFor(x => x.TransactionState, x => x.PickRandom<TransactionStateDb>());
         }
 
-        internal static TransactionEntity GenerateNewFileSessionTransactionEntity(UserEntity user,
+        public static TransactionEntity GenerateNewFileSessionTransactionEntity(UserEntity user,
             int seed = FakersConstants.FakersSeed)
         {
             return GetTransactionEntityFaker(seed)
@@ -35,7 +35,7 @@ namespace FileReceiver.Tests.Bl.ServicesTests.Data.EntityFakers
                 .RuleFor(x => x.TransactionType, TransactionTypeDb.FileReceivingSessionCreating);
         }
 
-        internal static TransactionEntity GenerateTransactionEntityWithFileReceivingSessionId(UserEntity user,
+        public static TransactionEntity GenerateTransactionEntityWithFileReceivingSessionId(UserEntity user,
             FileReceivingSessionEntity sessionEnt, int seed = FakersConstants.FakersSeed)
         {
             var transactionData = new TransactionDataModel();

@@ -7,6 +7,7 @@ namespace FileReceiver.Bl.Abstract.Services
 {
     public interface IFileReceivingSessionService
     {
+        Task<Guid> GetId(long userId);
         Task CreateFileReceivingSessionAsync(long userId);
         Task SetFileSizeConstraintAsync(Guid sessionId, int bytes = 1_000_000);
         Task SetFileNameConstraintAsync(Guid sessionId, string regexPatterns);
@@ -16,6 +17,5 @@ namespace FileReceiver.Bl.Abstract.Services
         Task<string> ExecuteSessionAsync(long userId);
         Task StopSessionAsync(long userId);
         Task<FileReceivingSessionState> GetSessionStateAsync(Guid sessionId);
-        Task<Guid?> GetFirstActiveFileReceivingSessionIdByUserIdAsync(long userId);
     }
 }
