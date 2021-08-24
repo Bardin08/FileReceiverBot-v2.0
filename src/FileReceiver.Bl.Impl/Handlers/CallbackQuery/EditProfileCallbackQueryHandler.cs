@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 
-using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Handlers;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Enums;

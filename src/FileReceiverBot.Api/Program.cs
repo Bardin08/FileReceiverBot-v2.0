@@ -7,13 +7,24 @@ using Microsoft.Extensions.Hosting;
 
 using Npgsql;
 
+using Serilog;
+
 namespace FileReceiverBot.Api
 {
     public static class Program
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().TryMigrate().Run();
+            try
+            {
+                CreateHostBuilder(args).Build()
+                    .TryMigrate()
+                    .Run();
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         private static IHost TryMigrate(this IHost host)
@@ -31,6 +42,10 @@ namespace FileReceiverBot.Api
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseSerilog();
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
