@@ -27,6 +27,7 @@ namespace FileReceiver.Bl.Impl.Factories
                     => _serviceProvider.GetService<EditProfileCallbackQueryHandler>(),
                 { Data: { } data } when data.StartsWith("fr-session")
                     => _serviceProvider.GetService<FileReceivingSessionCallbackQueryHandler>(),
+                _ => _serviceProvider.GetService<DefaultCallbackQueryHandler>(),
             };
         }
     }

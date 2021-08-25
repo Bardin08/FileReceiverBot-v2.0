@@ -26,7 +26,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         private readonly IServiceProvider _serviceProvider = Substitute.For<IServiceProvider>();
 
         private readonly IBotMessagesService _botMessagesService = Substitute.For<IBotMessagesService>();
-        private readonly IUserRegistrationService _userRegistrationService = Substitute.For<IUserRegistrationService>();
+        private readonly IUserService _userService = Substitute.For<IUserService>();
 
         private readonly IUpdateHandlerFactory _updateHandlerFactory = Substitute.For<IUpdateHandlerFactory>();
 
@@ -47,7 +47,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
             {
                 Data = "profile-",
             };
-            var callbackHandler = new EditProfileCallbackQueryHandler(_botMessagesService, _userRegistrationService,
+            var callbackHandler = new EditProfileCallbackQueryHandler(_botMessagesService, _userService,
                 _transactionRepository, _mapper);
             _serviceProvider.GetService<EditProfileCallbackQueryHandler>().Returns(callbackHandler);
 

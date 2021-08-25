@@ -7,9 +7,9 @@ namespace FileReceiver.Common.Extensions
     public class TransactionNotFoundException : Exception
     {
         public long UserId { get; }
-        public TransactionType TransactionType { get; }
+        public TransactionType? TransactionType { get; }
 
-        public TransactionNotFoundException(long userId, TransactionType transactionType)
+        public TransactionNotFoundException(long userId, TransactionType? transactionType = null)
             : base($"Transaction with type {transactionType} wasn't found for user {userId}")
         {
             UserId = userId;

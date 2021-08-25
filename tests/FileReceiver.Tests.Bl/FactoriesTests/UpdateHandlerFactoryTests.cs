@@ -25,7 +25,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         private readonly IUpdateHandlerFactory _sut;
         private readonly IServiceProvider _serviceProvider = Substitute.For<IServiceProvider>();
 
-        private readonly IUserRegistrationService _registrationService = Substitute.For<IUserRegistrationService>();
+        private readonly IUserService _service = Substitute.For<IUserService>();
         private readonly IBotMessagesService _botMessagesService = Substitute.For<IBotMessagesService>();
         private readonly IFileReceivingSessionService _receivingSessionService = Substitute.For<IFileReceivingSessionService>();
 
@@ -58,7 +58,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         public void CreateUpdateHandler_ShouldReturnRegistrationUpdateHandler_WhenUpdateTypeRegistration()
         {
             // Arrange
-            var updateHandler = new RegistrationUpdateHandler(_botMessagesService, _registrationService,
+            var updateHandler = new RegistrationUpdateHandler(_botMessagesService, _service,
                 _transactionRepository);
             _serviceProvider.GetService<RegistrationUpdateHandler>().Returns(updateHandler);
 

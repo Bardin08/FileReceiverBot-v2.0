@@ -31,7 +31,7 @@ namespace FileReceiver.Bl.Impl
         {
             services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
             services.AddTransient<IBotMessagesService, BotMessagesService>();
-            services.AddTransient<IUserRegistrationService, UserRegistrationService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<IFileReceivingSessionService, FileReceivingSessionService>();
             services.AddTransient<IFileReceivingService, FileReceivingService>();
             services.AddTransient<IBotTransactionService, BotTransactionService>();
@@ -74,6 +74,7 @@ namespace FileReceiver.Bl.Impl
         {
             services.AddTransient<EditProfileCallbackQueryHandler, EditProfileCallbackQueryHandler>();
             services.AddTransient<FileReceivingSessionCallbackQueryHandler, FileReceivingSessionCallbackQueryHandler>();
+            services.AddTransient<DefaultCallbackQueryHandler, DefaultCallbackQueryHandler>();
         }
 
         private static void AddFactories(this IServiceCollection services)

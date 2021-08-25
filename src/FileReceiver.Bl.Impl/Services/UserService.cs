@@ -15,28 +15,20 @@ using Telegram.Bot.Types;
 
 namespace FileReceiver.Bl.Impl.Services
 {
-    public class UserRegistrationService : IUserRegistrationService
+    public class UserService : IUserService
     {
-        private readonly IBotMessagesService _botMessagesService;
         private readonly IUserRepository _userRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IMapper _mapper;
 
-        public UserRegistrationService(
-            IBotMessagesService botMessagesService,
+        public UserService(
             ITransactionRepository transactionRepository,
             IUserRepository userRepository,
             IMapper mapper)
         {
             _transactionRepository = transactionRepository;
             _mapper = mapper;
-            _botMessagesService = botMessagesService;
             _userRepository = userRepository;
-        }
-
-        public Task CreateNewUserAsync(Update update)
-        {
-            throw new System.NotImplementedException();
         }
 
         public async Task SetFirstNameAsync(long userId, string firstName)
@@ -129,6 +121,27 @@ namespace FileReceiver.Bl.Impl.Services
             await _transactionRepository.UpdateAsync(registrationTransactionEntity);
 
             return userModel;
+        }
+
+        public async Task<bool> CheckIfExists(long userId)
+        {
+            return await _userRepository.CheckIfUserExistsAsync(userId);
+        }
+
+        public async Task<UserModel> Get(long userId)
+        {
+            return _mapper.Map<UserModel>(await _userRepository.GetByIdAsync(userId));
+        }
+
+        public async Task<UserModel> Add(UserModel user)
+        {
+            if (user is null) throw new ArgumentNullException(nameof(user));
+
+            var userEnt = _mapper.Map<UserEntity>(user);
+            var addedEnt = await _userRepository.AddAsync(userEnt);
+
+            if (userEnt == addedEnt) return user;
+            throw new InvalidOperationException("An error occured while adding a user");
         }
 
         private async Task UpdateUserEntityAsync(UserModel userModel)

@@ -17,16 +17,16 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
     public class RegistrationUpdateHandler : IUpdateHandler
     {
         private readonly IBotMessagesService _botMessagesService;
-        private readonly IUserRegistrationService _registrationService;
+        private readonly IUserService _service;
         private readonly ITransactionRepository _transactionRepository;
 
         public RegistrationUpdateHandler(
             IBotMessagesService botMessagesService,
-            IUserRegistrationService registrationService,
+            IUserService service,
             ITransactionRepository transactionRepository)
         {
             _botMessagesService = botMessagesService;
-            _registrationService = registrationService;
+            _service = service;
             _transactionRepository = transactionRepository;
         }
 
@@ -76,7 +76,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         {
             var firstName = model.Update.Message.Text;
 
-            await _registrationService.SetFirstNameAsync(model.UserId, firstName);
+            await _service.SetFirstNameAsync(model.UserId, firstName);
             await _botMessagesService.SendTextMessageAsync(model.UserId,
                 $"Great, {firstName}, now I need your lastname to continue");
         }
@@ -85,7 +85,7 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         {
             var lastName = model.Update.Message.Text;
 
-            await _registrationService.SetLastNameAsync(model.UserId, lastName);
+            await _service.SetLastNameAsync(model.UserId, lastName);
             await _botMessagesService.SendTextMessageAsync(model.UserId,
                 "Great, and the last step please send me a word or a sentence" +
                 " which I'll sometimes to confirm your actions");
@@ -95,13 +95,13 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         {
             var secretWord = model.Update.Message.Text;
 
-            await _registrationService.SetSecretWordAsync(model.UserId, secretWord);
+            await _service.SetSecretWordAsync(model.UserId, secretWord);
             await ProcessRegistrationCompleteStateAsync(model);
         }
 
         private async Task ProcessRegistrationCompleteStateAsync(RegistrationProcessingModel model)
         {
-            var user = await _registrationService.CompleteRegistrationAsync(model.UserId);
+            var user = await _service.CompleteRegistrationAsync(model.UserId);
 
             await _botMessagesService.SendTextMessageAsync(model.UserId, $"Great {user.FirstName}, now you're registered");
             await _botMessagesService.SendMenuAsync(model.UserId);
