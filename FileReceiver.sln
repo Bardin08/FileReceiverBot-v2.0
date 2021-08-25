@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{165C050E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{C02CCF88-D61D-41B1-9E65-4DBC4580462D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Mega", "src\FileReceiver.Mega\FileReceiver.Mega.csproj", "{25D09645-AC3C-40E7-8729-979B0D38F57A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Integrations.Mega", "src\FileReceiver.Integrations.Mega\FileReceiver.Integrations.Mega.csproj", "{25D09645-AC3C-40E7-8729-979B0D38F57A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Tests.Fakers", "tests\FileReceiver.Tests.Fakers\FileReceiver.Tests.Fakers.csproj", "{E421D5E4-8760-4936-BFB3-3E313EB223D1}"
 EndProject

@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FileReceiver.Mega\FileReceiver.Mega.csproj" />
+      <ProjectReference Include="..\FileReceiver.Integrations.Mega\FileReceiver.Integrations.Mega.csproj" />
     </ItemGroup>
 
 </Project>

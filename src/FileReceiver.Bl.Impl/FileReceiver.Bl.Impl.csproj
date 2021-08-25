@@ -30,7 +30,7 @@
       <ProjectReference Include="..\dal\FileReceiver.Dal.Entities\FileReceiver.Dal.Entities.csproj" />
       <ProjectReference Include="..\FileReceiver.Bl.Abstract\FileReceiver.Bl.Abstract.csproj" />
       <ProjectReference Include="..\FileReceiver.Common\FileReceiver.Common.csproj" />
-      <ProjectReference Include="..\FileReceiver.Mega\FileReceiver.Mega.csproj" />
+      <ProjectReference Include="..\FileReceiver.Integrations.Mega\FileReceiver.Integrations.Mega.csproj" />
     </ItemGroup>
   
 </Project>

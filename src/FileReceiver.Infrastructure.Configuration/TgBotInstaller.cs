@@ -1,4 +1,4 @@
-﻿using FileReceiver.Infrastructure.HostedServices.HostedServices;
+using FileReceiver.Infrastructure.HostedServices;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
