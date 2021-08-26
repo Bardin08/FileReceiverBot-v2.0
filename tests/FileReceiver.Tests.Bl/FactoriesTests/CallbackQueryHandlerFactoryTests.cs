@@ -1,16 +1,14 @@
 using System;
 
-using AutoMapper;
-
 using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl.Factories;
 using FileReceiver.Bl.Impl.Handlers.CallbackQuery;
-using FileReceiver.Dal.Abstract.Repositories;
 
 using FluentAssertions;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
@@ -27,12 +25,11 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
 
         private readonly IBotMessagesService _botMessagesService = Substitute.For<IBotMessagesService>();
         private readonly IUserService _userService = Substitute.For<IUserService>();
+        private readonly IBotTransactionService _transactionService = Substitute.For<IBotTransactionService>();
 
         private readonly IUpdateHandlerFactory _updateHandlerFactory = Substitute.For<IUpdateHandlerFactory>();
 
-        private readonly ITransactionRepository _transactionRepository = Substitute.For<ITransactionRepository>();
-
-        private readonly IMapper _mapper = Substitute.For<IMapper>();
+        private readonly ILogger<EditProfileCallbackQueryHandler> _logger = Substitute.For<ILogger<EditProfileCallbackQueryHandler>>();
 
         public CallbackQueryHandlerFactoryTests()
         {
@@ -47,8 +44,11 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
             {
                 Data = "profile-",
             };
-            var callbackHandler = new EditProfileCallbackQueryHandler(_botMessagesService, _userService,
-                _transactionRepository, _mapper);
+            var callbackHandler = new EditProfileCallbackQueryHandler(
+                _botMessagesService,
+                _userService,
+                _transactionService,
+                _logger);
             _serviceProvider.GetService<EditProfileCallbackQueryHandler>().Returns(callbackHandler);
 
             // Act
