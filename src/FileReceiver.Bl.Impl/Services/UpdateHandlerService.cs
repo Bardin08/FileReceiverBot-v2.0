@@ -12,8 +12,6 @@ using FileReceiver.Dal.Abstract.Repositories;
 
 using Microsoft.Extensions.Logging;
 
-using Newtonsoft.Json;
-
 using Telegram.Bot.Types;
 
 namespace FileReceiver.Bl.Impl.Services
