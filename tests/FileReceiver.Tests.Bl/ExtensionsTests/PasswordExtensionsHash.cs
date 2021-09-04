@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 using FileReceiver.Common.Extensions;
 
 using FluentAssertions;
@@ -37,11 +35,12 @@ namespace FileReceiver.Tests.Bl.ExtensionsTests
             result.Should().Be(expected);
         }
 
-        [Theory]
-        [InlineData(true, "1000:zYNm0Co2QKSnW89oNb5DwUFI2tCWnHad:ZmowQzAZQK9hRmlYMsx/4rsHKx/rfR0H", "password-code")]
-        public void CreateHash_ShouldReturnFalse_WhenPasswordInvalid(bool expected, string hash, string password)
+        [Fact]
+        public void CreateHash_ShouldReturnFalse_WhenPasswordInvalid()
         {
             // Arrange
+            const string hash = "1000:zYNm0Co2QKSnW89oNb5DwUFI2tCWnHad:ZmowQzAZQK9hRmlYMsx/4rsHKx/rfR0H";
+            const string password = "password-code";
 
             // Act
             var result = password.ValidatePassword(hash);

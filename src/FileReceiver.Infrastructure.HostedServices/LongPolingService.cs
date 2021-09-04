@@ -11,7 +11,7 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 
-namespace FileReceiver.Bl.Impl.HostedServices
+namespace FileReceiver.Infrastructure.HostedServices
 {
     public class LongPolingService : BackgroundService
     {

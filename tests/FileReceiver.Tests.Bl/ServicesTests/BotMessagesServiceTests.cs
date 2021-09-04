@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl.Services;
 
+using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 using Telegram.Bot;
@@ -16,11 +18,12 @@ namespace FileReceiver.Tests.Bl.ServicesTests
     public class BotMessagesServiceTests
     {
         private readonly IBotMessagesService _sut;
-        private readonly ITelegramBotClient _botClient = Substitute.For<ITelegramBotClient>();
 
+        private readonly ITelegramBotClient _botClient = Substitute.For<ITelegramBotClient>();
+        private readonly ILogger<BotMessagesService> _logger = Substitute.For<ILogger<BotMessagesService>>();
         public BotMessagesServiceTests()
         {
-            _sut = new BotMessagesService(_botClient);
+            _sut = new BotMessagesService(_botClient, _logger);
         }
 
         [Theory]

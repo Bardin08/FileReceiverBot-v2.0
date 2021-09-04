@@ -20,8 +20,9 @@ namespace FileReceiver.Bl.Abstract.Services
         /// </summary>
         /// <param name="userId">Transaction's owner</param>
         /// <param name="transactionType"><see cref="TransactionType">Type</see> of the transaction which will be completed</param>
+        /// <param name="data"><see cref="TransactionModel"/> the represents some metadata about the transaction.</param>
         /// <returns><see cref="Task{TResult}"/></returns>
-        Task<TransactionModel> Create(long userId, TransactionType transactionType);
+        Task<TransactionModel> Create(long userId, TransactionType transactionType, TransactionDataModel data = null);
 
         /// <summary>
         /// Receives the last active transaction with a given type for user.
@@ -30,7 +31,16 @@ namespace FileReceiver.Bl.Abstract.Services
         /// <param name="transactionType"><see cref="TransactionType">Type</see> of the transaction which will be completed</param>
         /// <exception cref="TransactionNotFoundException">Throws when transaction with this type is not exists for user or it's not active</exception>
         /// <returns><see cref="Task{TransactionModel}"/></returns>
-        Task<TransactionModel> Get(long userId, TransactionType transactionType);
+        Task<TransactionModel> Get(long userId, TransactionType? transactionType = null);
+
+        /// <summary>
+        /// Receives the last active transaction with a given type for user.
+        /// </summary>
+        /// <param name="userId">Transaction's owner</param>
+        /// <param name="transactionType"><see cref="TransactionType">Type</see> of the transaction which will be completed</param>
+        /// <exception cref="TransactionNotFoundException">Throws when transaction with this type is not exists for user or it's not active</exception>
+        /// <returns><see cref="Task{TransactionModel}"/></returns>
+        Task<TransactionModel> GetNullIfNotExists(long userId, TransactionType? transactionType = null);
 
         /// <summary>
         /// Updates the last active transaction with a given type for user.
@@ -57,5 +67,9 @@ namespace FileReceiver.Bl.Abstract.Services
         /// <returns><see cref="Task"/></returns>
         Task Complete(long userId, TransactionType transactionType);
 
+        /// <summary>
+        /// Aborts all transactions for user with a given userId.
+        /// </summary>
+        Task AbortAllForUser(long userId);
     }
 }

@@ -80,25 +80,8 @@ namespace FileReceiver.Tests.Bl.ServicesTests
             await _sut.CreateFileReceivingSessionAsync(userEnt.Id);
 
             // Assert
-            await _userRepository.Received(1).CheckIfUserExistsAsync(userEnt.Id);
-            _mapper.Received(1).Map<FileReceivingSessionEntity>(Arg.Any<FileReceivingSessionModel>());
             await _receivingSessionRepository.Received(1).AddAsync(Arg.Any<FileReceivingSessionEntity>());
             await _transactionService.Received(1).Add(Arg.Any<TransactionModel>());
-        }
-
-        [Fact]
-        public async Task CreateFileReceivingSessionAsync_ShouldReturnAnException_WhenUserWithGivenIdIsNotExists()
-        {
-            // Arrange
-            var userEnt = UserModelFaker.GenerateUserModel();
-            _userRepository.CheckIfUserExistsAsync(Arg.Any<long>()).Returns(false);
-
-            // Act
-            Func<Task> createSession = async () => await _sut.CreateFileReceivingSessionAsync(userEnt.Id);
-
-            // Assert
-            createSession.Should().Throw<UserProfileNotFoundException>()
-                .And.TelegramUserId.Should().Be(userEnt.Id);
         }
 
         [Fact]

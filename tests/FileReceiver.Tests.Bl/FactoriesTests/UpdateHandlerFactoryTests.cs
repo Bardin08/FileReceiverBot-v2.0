@@ -11,6 +11,7 @@ using FileReceiver.Integrations.Mega.Abstract;
 using FluentAssertions;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
@@ -25,7 +26,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         private readonly IUpdateHandlerFactory _sut;
         private readonly IServiceProvider _serviceProvider = Substitute.For<IServiceProvider>();
 
-        private readonly IUserRegistrationService _registrationService = Substitute.For<IUserRegistrationService>();
+        private readonly IUserService _service = Substitute.For<IUserService>();
         private readonly IBotMessagesService _botMessagesService = Substitute.For<IBotMessagesService>();
         private readonly IFileReceivingSessionService _receivingSessionService = Substitute.For<IFileReceivingSessionService>();
 
@@ -34,6 +35,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
 
         private readonly ITelegramBotClient _botClient = Substitute.For<ITelegramBotClient>();
         private readonly IMegaApiClient _megaApiClient = Substitute.For<IMegaApiClient>();
+
 
         public UpdateHandlerFactoryTests()
         {
@@ -58,7 +60,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         public void CreateUpdateHandler_ShouldReturnRegistrationUpdateHandler_WhenUpdateTypeRegistration()
         {
             // Arrange
-            var updateHandler = new RegistrationUpdateHandler(_botMessagesService, _registrationService,
+            var updateHandler = new RegistrationUpdateHandler(_botMessagesService, _service,
                 _transactionRepository);
             _serviceProvider.GetService<RegistrationUpdateHandler>().Returns(updateHandler);
 
@@ -87,8 +89,10 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         public void CreateUpdateHandler_ShouldReturnFileReceivingSessionCreatingUpdateHandler_WhenUpdateTypeFileReceivingSessionCreating()
         {
             // Arrange
+            ILogger<FileReceivingSessionCreatingUpdateHandler> logger =
+                Substitute.For<ILogger<FileReceivingSessionCreatingUpdateHandler>>();
             var updateHandler = new FileReceivingSessionCreatingUpdateHandler(_botMessagesService,
-                _receivingSessionService, _botClient, _megaApiClient);
+                _receivingSessionService, _botClient, _megaApiClient, logger);
             _serviceProvider.GetService<FileReceivingSessionCreatingUpdateHandler>().Returns(updateHandler);
 
             // Act

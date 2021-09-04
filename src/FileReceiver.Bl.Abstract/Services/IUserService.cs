@@ -2,16 +2,16 @@ using System.Threading.Tasks;
 
 using FileReceiver.Common.Models;
 
-using Telegram.Bot.Types;
-
 namespace FileReceiver.Bl.Abstract.Services
 {
-    public interface IUserRegistrationService
+    public interface IUserService
     {
-        Task CreateNewUserAsync(Update update);
         Task SetFirstNameAsync(long userId, string firstName);
         Task SetLastNameAsync(long userId, string lastName);
         Task SetSecretWordAsync(long userId, string secretWord);
         Task<UserModel> CompleteRegistrationAsync(long userId);
+        Task<bool> CheckIfExists(long userId);
+        Task<UserModel> Get(long userId);
+        Task<UserModel> Add(UserModel user);
     }
 }

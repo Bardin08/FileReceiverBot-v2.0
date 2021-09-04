@@ -4,7 +4,8 @@ using FileReceiver.Bl.Abstract.Factories;
 using FileReceiver.Bl.Abstract.Handlers;
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Extensions;
-using FileReceiver.Dal.Abstract.Repositories;
+
+using Microsoft.Extensions.Logging;
 
 using Telegram.Bot.Types;
 
@@ -12,29 +13,32 @@ namespace FileReceiver.Bl.Impl.Handlers.Commands
 {
     public class StartCommandHandler : ICommandHandler
     {
-        private readonly IUserRepository _userRepository;
-        private readonly ICommandHandlerFactory _commandHandlerFactory;
+        private readonly IUserService _userService;
         private readonly IBotMessagesService _botMessagesService;
+        private readonly ICommandHandlerFactory _commandHandlerFactory;
+        private readonly ILogger<StartCommandHandler> _logger;
 
         public StartCommandHandler(
-            IUserRepository userRepository,
+            IUserService userService,
+            IBotMessagesService botMessagesService,
             ICommandHandlerFactory commandHandlerFactory,
-            IBotMessagesService botMessagesService)
+            ILogger<StartCommandHandler> logger)
         {
-            _userRepository = userRepository;
-            _commandHandlerFactory = commandHandlerFactory;
+            _userService = userService;
             _botMessagesService = botMessagesService;
+            _commandHandlerFactory = commandHandlerFactory;
+            _logger = logger;
         }
 
         public async Task HandleCommandAsync(Update update)
         {
             var userId = update.GetTgUserId();
+            _logger.LogDebug("Start command received from {userId}", userId);
 
-            var userAccount = await _userRepository.GetByIdAsync(userId);
-            if (userAccount == null)
+            var userAccount = await _userService.Get(userId);
+            if (userAccount is null)
             {
-                // TODO: Replace plain text literal with resource file
-                var registrationHandler = _commandHandlerFactory.CreateCommandHandler("/register");
+                var registrationHandler = _commandHandlerFactory.CreateCommandHandler(Common.Constants.Commands.Register);
                 await registrationHandler.HandleCommandAsync(update);
                 return;
             }

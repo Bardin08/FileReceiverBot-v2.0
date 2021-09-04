@@ -42,17 +42,12 @@ namespace FileReceiver.Bl.Impl.Services
 
         public async Task CreateFileReceivingSessionAsync(long userId)
         {
-            if (!await _userRepository.CheckIfUserExistsAsync(userId))
-            {
-                throw new UserProfileNotFoundException(userId, nameof(CreateFileReceivingSessionAsync));
-            }
-
             var session = new FileReceivingSessionModel
             {
                 UserId = userId,
                 Constrains = new ConstraintsModel(),
                 SessionState = FileReceivingSessionState.FileSizeConstraintSet,
-                MaxFiles = 50,
+                MaxFiles = 50, // TODO: should be moved to a constants file
                 CreateData = DateTimeOffset.UtcNow,
             };
 

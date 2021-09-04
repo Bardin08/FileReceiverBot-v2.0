@@ -5,17 +5,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Telegram.Bot" Version="16.0.1" />
+      <PackageReference Include="Telegram.Bot" Version="16.0.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\FileReceiver.Common\FileReceiver.Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Hosting.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
-        <HintPath>..\..\..\..\..\..\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\5.0.0\ref\net5.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

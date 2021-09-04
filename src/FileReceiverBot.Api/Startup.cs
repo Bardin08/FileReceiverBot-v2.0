@@ -1,22 +1,15 @@
-using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl;
-using FileReceiver.Bl.Impl.HostedServices;
-using FileReceiver.Bl.Impl.Services;
 using FileReceiver.Dal;
-using FileReceiver.Integrations.Mega;
-
-using FileReceiverBot.Api.Configuration;
+using FileReceiver.Infrastructure.Configuration;
+using FileReceiver.Integrations.Configuration;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 
 using Newtonsoft.Json.Converters;
-
-using Telegram.Bot;
 
 namespace FileReceiverBot.Api
 {
@@ -37,26 +30,10 @@ namespace FileReceiverBot.Api
                     opt.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
 
-            services.AddTransient<IUpdateHandlerService, UpdateHandlerService>();
-
-            var botSettings = new BotSettings();
-            Configuration.Bind(nameof(BotSettings), botSettings);
-
-            services.AddSingleton(botSettings);
-            services.AddTransient<ITelegramBotClient>(_ => new TelegramBotClient(Configuration["BotSettings:Token"]));
+            services.AddInfrastructure(Configuration);
             services.AddBl();
             services.AddDb(Configuration);
-            services.AddMega(Configuration);
-
-            if (bool.Parse(Configuration["BotSettings:UseLongPolling"]))
-            {
-                services.AddHostedService<LongPolingService>();
-            }
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FileReceiverBot.Api", Version = "v1" });
-            });
+            services.AddIntegrations(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

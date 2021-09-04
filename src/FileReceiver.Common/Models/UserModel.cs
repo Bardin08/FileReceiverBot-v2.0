@@ -17,5 +17,16 @@ namespace FileReceiver.Common.Models
 
         public DateTimeOffset RegistrationStartTimestamp { get; set; }
         public DateTimeOffset? RegistrationEndTimestamp { get; set; }
+
+        public static UserModel CreateNew(long userId, string tgTag)
+        {
+            return new UserModel()
+            {
+                Id = userId,
+                TelegramTag = tgTag,
+                RegistrationState = RegistrationState.NewUser,
+                RegistrationStartTimestamp = DateTimeOffset.UtcNow,
+            };
+        }
     }
 }

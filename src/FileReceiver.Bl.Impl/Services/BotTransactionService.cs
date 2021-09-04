@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -32,21 +31,55 @@ namespace FileReceiver.Bl.Impl.Services
             return transaction;
         }
 
-        public Task<TransactionModel> Create(long userId, TransactionType transactionType)
+        public Task<TransactionModel> Create(
+            long userId,
+            TransactionType transactionType,
+            TransactionDataModel data = null)
         {
             return Task.FromResult(new TransactionModel()
             {
                 UserId = userId,
                 TransactionType = transactionType,
                 TransactionState = TransactionState.Active,
-                TransactionData = new TransactionDataModel(),
+                TransactionData = data ?? new TransactionDataModel(),
             });
         }
 
-        public async Task<TransactionModel> Get(long userId, TransactionType transactionType)
+        public async Task<TransactionModel> Get(long userId, TransactionType? transactionType = null)
         {
-            return _mapper.Map<TransactionModel>(
-                await GetTransactionAndThrowExceptionIfNotExists(userId, transactionType));
+            TransactionEntity transactionEnt;
+            if (transactionType is not null)
+            {
+                transactionEnt = await GetTransactionAndThrowExceptionIfNotExists(userId, transactionType.Value);
+            }
+            else
+            {
+                transactionEnt = await GetTransactionAndThrowExceptionIfNotExists(userId);
+            }
+
+            return _mapper.Map<TransactionModel>(transactionEnt);
+        }
+
+        public async Task<TransactionModel> GetNullIfNotExists(long userId, TransactionType? transactionType = null)
+        {
+            try
+            {
+                TransactionEntity transactionEnt;
+                if (transactionType is not null)
+                {
+                    transactionEnt = await GetTransactionAndThrowExceptionIfNotExists(userId, transactionType.Value);
+                }
+                else
+                {
+                    transactionEnt = await GetTransactionAndThrowExceptionIfNotExists(userId);
+                }
+
+                return _mapper.Map<TransactionModel>(transactionEnt);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public async Task Update(TransactionModel transaction)
@@ -70,6 +103,22 @@ namespace FileReceiver.Bl.Impl.Services
         public async Task Complete(long userId, TransactionType transactionType)
         {
             await UpdateState(userId, transactionType, TransactionState.Committed);
+        }
+
+        public async Task AbortAllForUser(long userId)
+        {
+            await _transactionRepository.AbortAllTransactionsForUser(userId);
+        }
+
+        private async Task<TransactionEntity> GetTransactionAndThrowExceptionIfNotExists(long userId)
+        {
+            var transactionEnt = await _transactionRepository.GetLastActiveTransactionByUserId(userId);
+            if (transactionEnt is null)
+            {
+                throw new TransactionNotFoundException(userId);
+            }
+
+            return transactionEnt;
         }
 
         private async Task<TransactionEntity> GetTransactionAndThrowExceptionIfNotExists(long userId,

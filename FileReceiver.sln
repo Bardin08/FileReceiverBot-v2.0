@@ -26,9 +26,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{165C050E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{C02CCF88-D61D-41B1-9E65-4DBC4580462D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Mega", "src\FileReceiver.Mega\FileReceiver.Mega.csproj", "{25D09645-AC3C-40E7-8729-979B0D38F57A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Integrations.Mega", "src\FileReceiver.Integrations.Mega\FileReceiver.Integrations.Mega.csproj", "{25D09645-AC3C-40E7-8729-979B0D38F57A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Tests.Fakers", "tests\FileReceiver.Tests.Fakers\FileReceiver.Tests.Fakers.csproj", "{E421D5E4-8760-4936-BFB3-3E313EB223D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FBC36705-5D1A-4AB5-BAA2-B50CDE8C1124}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Infrastructure.Configuration", "src\FileReceiver.Infrastructure.Configuration\FileReceiver.Infrastructure.Configuration.csproj", "{27DC8C49-6776-4B50-AF30-AC1D87AEE754}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Integrations.Configuration", "src\FileReceiver.Integrations.Configuration\FileReceiver.Integrations.Configuration.csproj", "{B4E3F3B3-1B5B-4CBA-9D6F-B0BA84C7A3E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Infrastructure.HostedServices", "src\FileReceiver.Infrastructure.HostedServices\FileReceiver.Infrastructure.HostedServices.csproj", "{3E7B47CB-F6C3-4861-9BE6-6373FD8AC927}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +57,10 @@ Global
 		{C02CCF88-D61D-41B1-9E65-4DBC4580462D} = {9045B708-F21E-4EB8-ABB2-76EB6695F6A3}
 		{25D09645-AC3C-40E7-8729-979B0D38F57A} = {C02CCF88-D61D-41B1-9E65-4DBC4580462D}
 		{E421D5E4-8760-4936-BFB3-3E313EB223D1} = {165C050E-2183-4DB4-A63D-B362532F77F4}
+		{FBC36705-5D1A-4AB5-BAA2-B50CDE8C1124} = {9045B708-F21E-4EB8-ABB2-76EB6695F6A3}
+		{27DC8C49-6776-4B50-AF30-AC1D87AEE754} = {FBC36705-5D1A-4AB5-BAA2-B50CDE8C1124}
+		{B4E3F3B3-1B5B-4CBA-9D6F-B0BA84C7A3E2} = {C02CCF88-D61D-41B1-9E65-4DBC4580462D}
+		{3E7B47CB-F6C3-4861-9BE6-6373FD8AC927} = {FBC36705-5D1A-4AB5-BAA2-B50CDE8C1124}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{70B0EF0C-D42D-4CF2-93E2-357FC9190A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -91,5 +103,17 @@ Global
 		{E421D5E4-8760-4936-BFB3-3E313EB223D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E421D5E4-8760-4936-BFB3-3E313EB223D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E421D5E4-8760-4936-BFB3-3E313EB223D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27DC8C49-6776-4B50-AF30-AC1D87AEE754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27DC8C49-6776-4B50-AF30-AC1D87AEE754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27DC8C49-6776-4B50-AF30-AC1D87AEE754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27DC8C49-6776-4B50-AF30-AC1D87AEE754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4E3F3B3-1B5B-4CBA-9D6F-B0BA84C7A3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E3F3B3-1B5B-4CBA-9D6F-B0BA84C7A3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E3F3B3-1B5B-4CBA-9D6F-B0BA84C7A3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E3F3B3-1B5B-4CBA-9D6F-B0BA84C7A3E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E7B47CB-F6C3-4861-9BE6-6373FD8AC927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E7B47CB-F6C3-4861-9BE6-6373FD8AC927}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E7B47CB-F6C3-4861-9BE6-6373FD8AC927}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E7B47CB-F6C3-4861-9BE6-6373FD8AC927}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
