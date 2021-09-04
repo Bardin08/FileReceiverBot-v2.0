@@ -8,6 +8,8 @@ using FileReceiver.Common.Exceptions;
 using FileReceiver.Common.Extensions;
 using FileReceiver.Integrations.Mega.Abstract;
 
+using Microsoft.Extensions.Logging;
+
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -21,17 +23,20 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
         private readonly IFileReceivingSessionService _receivingSessionService;
         private readonly ITelegramBotClient _botClient;
         private readonly IMegaApiClient _megaClient;
+        private readonly ILogger<FileReceivingSessionCreatingUpdateHandler> _logger;
 
         public FileReceivingSessionCreatingUpdateHandler(
             IBotMessagesService botMessagesService,
             IFileReceivingSessionService receivingSessionService,
             ITelegramBotClient botClient,
-            IMegaApiClient megaClient)
+            IMegaApiClient megaClient,
+            ILogger<FileReceivingSessionCreatingUpdateHandler> logger)
         {
             _botMessagesService = botMessagesService;
             _receivingSessionService = receivingSessionService;
             _botClient = botClient;
             _megaClient = megaClient;
+            _logger = logger;
         }
 
         public async Task HandleUpdateAsync(Update update)
@@ -50,7 +55,6 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                     Update = update,
                 };
 
-                // TODO: rewrite with pattern matching
                 switch (sessionState)
                 {
                     case FileReceivingSessionState.FileSizeConstraintSet:
@@ -80,16 +84,16 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                         break;
                 }
             }
-            catch (FileReceivingSessionNotFound)
+            catch (FileReceivingSessionNotFound ex)
             {
-                // TODO: log exception
+                _logger.LogError(ex, "File receiving session not found!");
                 await _botMessagesService.SendErrorAsync(userId, "All your sessions are configured and executed now. " +
                                                                  "To check the list of active file receiving sessions " +
                                                                  "use command /active_sessions");
             }
             catch (Exception ex)
             {
-                // TODO: log exception
+                _logger.LogError(ex, "An error occured while handling file receiving session creating action!");
                 await _botMessagesService.SendErrorAsync(userId, ex.Message);
             }
         }
@@ -112,9 +116,10 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                     "You can check your pattern [here](https://regex101.com/). " +
                     "To send several patterns separate them with a coma");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Log the exception
+                _logger.LogError(ex, "An error occured while setting file size constraint for user {userId}!",
+                    data.UserId);
                 await _botMessagesService.SendErrorAsync(data.UserId,
                     "An error occured while setting file size constraint");
             }
@@ -128,9 +133,10 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 await _botMessagesService.SendTextMessageAsync(data.UserId,
                     "Now send me this file extension constraints. For example: *pdf, docx* ");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Log the exception
+                _logger.LogError(ex, "An error occured while setting file name constraint for user {userId}",
+                    data.UserId);
                 await _botMessagesService.SendErrorAsync(data.UserId,
                     "An error occured while setting file name constraint");
             }
@@ -145,9 +151,10 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 await _botMessagesService.SendTextMessageAsync(data.UserId,
                     "Now send me how much files can be stored at this session");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Log the exception
+                _logger.LogError(ex, "An error occured while setting file extensions constraint for user {userId}",
+                    data.UserId);
                 await _botMessagesService.SendErrorAsync(data.UserId,
                     "An error occured while setting file extensions constraint");
             }
@@ -176,9 +183,10 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 await _botMessagesService.SendMessageWithKeyboardAsync(data.UserId, "Select the file storage",
                     fileStorageKeyboard);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Log the exception
+                _logger.LogError(ex, "An error occured while setting file receiving session storage for user {userId}",
+                    data.UserId);
                 await _botMessagesService.SendErrorAsync(data.UserId,
                     "An error occured while setting file receiving session storage");
             }
@@ -196,7 +204,8 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 }
                 catch (FileReceivingSessionActionErrorException ex)
                 {
-                    // TODO: Log the exception
+                    _logger.LogError(ex, "An error occured while setting a file storage for user {userId}",
+                        data.UserId);
                     await _botMessagesService.SendErrorAsync(data.UserId, ex.Message);
                 }
 
@@ -213,9 +222,10 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 });
                 await _botMessagesService.SendMessageWithKeyboardAsync(data.UserId, "Session info", submitSession);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Log the exception
+                _logger.LogError(ex, "An error occured while confirming the session data for user {userId}",
+                    data.UserId);
                 await _botMessagesService.SendErrorAsync(data.UserId,
                     "An error occured while confirming the session data");
             }
@@ -241,13 +251,14 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 }
                 catch (FileReceivingSessionActionErrorException ex)
                 {
-                    // TODO: Log the exception
+                    _logger.LogError(ex, ex.Message + " for user {userId}", userId);
                     await _botMessagesService.SendErrorAsync(userId, ex.Message);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: Log the exception
+                _logger.LogError(ex, "An error occured while creating the session's infrastructure for user {userId}",
+                    userId);
                 await _botMessagesService.SendErrorAsync(userId,
                     "An error occured while creating the session's infrastructure");
             }

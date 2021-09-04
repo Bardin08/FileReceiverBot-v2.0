@@ -11,6 +11,7 @@ using FileReceiver.Integrations.Mega.Abstract;
 using FluentAssertions;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
@@ -34,6 +35,7 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
 
         private readonly ITelegramBotClient _botClient = Substitute.For<ITelegramBotClient>();
         private readonly IMegaApiClient _megaApiClient = Substitute.For<IMegaApiClient>();
+
 
         public UpdateHandlerFactoryTests()
         {
@@ -87,8 +89,10 @@ namespace FileReceiver.Tests.Bl.FactoriesTests
         public void CreateUpdateHandler_ShouldReturnFileReceivingSessionCreatingUpdateHandler_WhenUpdateTypeFileReceivingSessionCreating()
         {
             // Arrange
+            ILogger<FileReceivingSessionCreatingUpdateHandler> logger =
+                Substitute.For<ILogger<FileReceivingSessionCreatingUpdateHandler>>();
             var updateHandler = new FileReceivingSessionCreatingUpdateHandler(_botMessagesService,
-                _receivingSessionService, _botClient, _megaApiClient);
+                _receivingSessionService, _botClient, _megaApiClient, logger);
             _serviceProvider.GetService<FileReceivingSessionCreatingUpdateHandler>().Returns(updateHandler);
 
             // Act

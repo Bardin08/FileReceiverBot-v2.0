@@ -8,6 +8,8 @@ using FileReceiver.Common.Exceptions;
 using FileReceiver.Dal.Abstract.Repositories;
 using FileReceiver.Integrations.Mega.Abstract;
 
+using Microsoft.Extensions.Logging;
+
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -21,6 +23,7 @@ namespace FileReceiver.Bl.Impl.Services
         private readonly IFileReceivingSessionRepository _fileReceivingSessionRepository;
         private readonly IMegaApiClient _megaClient;
         private readonly ITelegramBotClient _botClient;
+        private readonly ILogger<FileReceivingService> _logger;
 
         public FileReceivingService(
             IBotMessagesService botMessagesService,
@@ -28,7 +31,8 @@ namespace FileReceiver.Bl.Impl.Services
             IBotTransactionService transactionService,
             IFileReceivingSessionRepository fileReceivingSessionRepository,
             IMegaApiClient megaClient,
-            ITelegramBotClient botClient)
+            ITelegramBotClient botClient,
+            ILogger<FileReceivingService> logger)
         {
             _botMessagesService = botMessagesService;
             _botTransactionService = botTransactionService;
@@ -36,6 +40,7 @@ namespace FileReceiver.Bl.Impl.Services
             _fileReceivingSessionRepository = fileReceivingSessionRepository;
             _megaClient = megaClient;
             _botClient = botClient;
+            _logger = logger;
         }
 
         public async Task UpdateFileReceivingState(long userId, FileReceivingState newState)
@@ -77,9 +82,9 @@ namespace FileReceiver.Bl.Impl.Services
                 return transaction.TransactionData.GetDataPiece<FileReceivingState>(
                     TransactionDataParameter.FileReceivingState);
             }
-            catch (InvalidTransactionTypeException)
+            catch (InvalidTransactionTypeException ex)
             {
-                // TODO: Log exception
+                _logger.LogError(ex, "An error occured " + ex.Message + " for user {userId}", userId);
                 await _botMessagesService.SendErrorAsync(userId, "An error occured while processing you input. " +
                                                                  "Try to use command /cancel and then start " +
                                                                  "a file sending process again");
