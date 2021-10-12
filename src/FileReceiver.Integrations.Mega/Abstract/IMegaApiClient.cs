@@ -2,8 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-using FileReceiver.Integrations.Mega.Models;
-
 namespace FileReceiver.Integrations.Mega.Abstract
 {
     public interface IMegaApiClient

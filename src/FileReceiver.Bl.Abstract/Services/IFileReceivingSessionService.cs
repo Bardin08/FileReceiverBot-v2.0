@@ -2,12 +2,14 @@ using System;
 using System.Threading.Tasks;
 
 using FileReceiver.Common.Enums;
+using FileReceiver.Common.Models;
 
 namespace FileReceiver.Bl.Abstract.Services
 {
     public interface IFileReceivingSessionService
     {
         Task<Guid> GetId(long userId);
+        Task<FileReceivingSessionModel> Get(Guid sessionId);
         Task CreateFileReceivingSessionAsync(long userId);
         Task SetFileSizeConstraintAsync(Guid sessionId, int bytes = 1_000_000);
         Task SetFileNameConstraintAsync(Guid sessionId, string regexPatterns);

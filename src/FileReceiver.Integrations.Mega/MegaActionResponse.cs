@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace FileReceiver.Integrations.Mega.Models
+namespace FileReceiver.Integrations.Mega
 {
     public record MegaActionResponse
     {
@@ -11,6 +11,7 @@ namespace FileReceiver.Integrations.Mega.Models
 
         public Guid TransactionId { get; private init; }
         public string Token { get; init; }
+        public string FailDescription { get; set; }
         public bool Successful { get; init; }
         public ActionDetails ActionDetails { get; private init; }
 
@@ -25,12 +26,17 @@ namespace FileReceiver.Integrations.Mega.Models
             };
         }
 
-        public static MegaActionResponse Fail(Guid transactionId, string token, ActionDetails details = null)
+        public static MegaActionResponse Fail(
+            Guid transactionId,
+            string token,
+            string description,
+            ActionDetails details = null)
         {
             return new MegaActionResponse()
             {
                 Successful = false,
                 TransactionId = transactionId,
+                FailDescription = description,
                 Token = token,
                 ActionDetails = details,
             };

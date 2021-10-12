@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CG.Web.MegaApiClient;
 
 using FileReceiver.Integrations.Mega.Configuration;
-using FileReceiver.Integrations.Mega.Models;
 
 using Microsoft.Extensions.Options;
 
@@ -50,13 +49,13 @@ namespace FileReceiver.Integrations.Mega.Impl
             var folder = (await _client.GetNodesAsync()).FirstOrDefault(x => x.Name == token);
             if (folder is null)
             {
-                return MegaActionResponse.Fail(transactionId, token, actionDetails);
+                return MegaActionResponse.Fail(transactionId, token, "Suitable folder wasn't found", actionDetails);
             }
 
             var file = await _client.UploadAsync(fileAsStream, fileName, folder);
             if (file is null)
             {
-                return MegaActionResponse.Fail(transactionId, token, actionDetails);
+                return MegaActionResponse.Fail(transactionId, token, "File wasn't uploaded", actionDetails);
             }
 
             await _client.LogoutAsync();
@@ -79,7 +78,7 @@ namespace FileReceiver.Integrations.Mega.Impl
             var folder = (await _client.GetNodesAsync()).FirstOrDefault(x => x.Id == folderNodeInfo.Id);
             if (folder is null)
             {
-                return MegaActionResponse.Fail(transactionId, token, actionDetails);
+                return MegaActionResponse.Fail(transactionId, token, "Suitable folder wasn't found", actionDetails);
             }
 
             actionDetails.Data = await _client.DownloadAsync(folder);
@@ -114,7 +113,7 @@ namespace FileReceiver.Integrations.Mega.Impl
             var folder = await _client.CreateFolderAsync(token, root);
             if (folder is null)
             {
-                return MegaActionResponse.Fail(transactionId, token, actionDetails);
+                return MegaActionResponse.Fail(transactionId, token, "Suitable folder wasn't found", actionDetails);
             }
 
             actionDetails.NodeLink = (await _client.GetDownloadLinkAsync(folder)).ToString();
@@ -138,7 +137,7 @@ namespace FileReceiver.Integrations.Mega.Impl
             var folder = (await _client.GetNodesAsync()).FirstOrDefault(x => x.Id == folderNodeInfo.Id);
             if (folder is null)
             {
-                return MegaActionResponse.Fail(transactionId, token, actionDetails);
+                return MegaActionResponse.Fail(transactionId, token, "Suitable folder wasn't found", actionDetails);
             }
 
             await _client.DeleteAsync(folder, false);

@@ -40,6 +40,12 @@ namespace FileReceiver.Bl.Impl.Services
             return await GetSessionIdAndThrowExceptionIfNotExists(userId, nameof(GetId));
         }
 
+        public async Task<FileReceivingSessionModel> Get(Guid sessionId)
+        {
+            return _mapper.Map<FileReceivingSessionModel>(
+                await _receivingSessionRepository.GetByIdAsync(sessionId));
+        }
+
         public async Task CreateFileReceivingSessionAsync(long userId)
         {
             var session = new FileReceivingSessionModel
