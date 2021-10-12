@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 
 using FileReceiver.Bl.Abstract.Services;
+using FileReceiver.Common.Constants;
 using FileReceiver.Common.Enums;
 using FileReceiver.Common.Exceptions;
 using FileReceiver.Common.Models;
@@ -47,7 +48,7 @@ namespace FileReceiver.Bl.Impl.Services
                 UserId = userId,
                 Constrains = new ConstraintsModel(),
                 SessionState = FileReceivingSessionState.FileSizeConstraintSet,
-                MaxFiles = 50, // TODO: should be moved to a constants file
+                MaxFiles = DefaultValues.FilesAtSession,
                 CreateData = DateTimeOffset.UtcNow,
             };
 

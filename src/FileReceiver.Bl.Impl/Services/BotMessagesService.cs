@@ -32,7 +32,6 @@ namespace FileReceiver.Bl.Impl.Services
 
         public async Task SendErrorAsync(long userOrChatId, string errorMessage)
         {
-            // TODO: Update error sending, maybe add an image or smth like that and replace plain text with resources file
             var sentMsg = await _botClient.SendTextMessageAsync(userOrChatId,
                 $"Sorry, an error happen. Error description: {errorMessage}");
             if (sentMsg is null) _logger.LogWarning("Message wasn't sent to {userId}", userOrChatId);

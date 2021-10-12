@@ -111,10 +111,9 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
 
                 await _receivingSessionService.SetFileSizeConstraintAsync(data.SessionId, maxFileSize);
                 await _botMessagesService.SendTextMessageAsync(data.UserId,
-                    // TODO: Add regex pattern examples
                     "Now send me file name constraints written with regex pattern. " +
                     "You can check your pattern [here](https://regex101.com/). " +
-                    "To send several patterns separate them with a coma");
+                    "If you don't want to use any file name constraints send `-1`.");
             }
             catch (Exception ex)
             {

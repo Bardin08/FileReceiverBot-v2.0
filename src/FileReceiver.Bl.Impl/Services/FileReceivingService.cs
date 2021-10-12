@@ -59,7 +59,6 @@ namespace FileReceiver.Bl.Impl.Services
 
         public async Task<bool> SaveDocument(long userId, Guid sessionId, Document document)
         {
-            // TODO: Add constraints check
             var transaction = await _transactionService.Get(userId, TransactionType.FileSending);
             var memStream = new MemoryStream();
             var fileInfo = await _botClient.GetFileAsync(document.FileId);
