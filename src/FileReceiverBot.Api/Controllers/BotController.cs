@@ -27,12 +27,6 @@ namespace FileReceiverBot.Api.Controllers
         [Route("/update")]
         public async Task<IActionResult> ProcessTelegramMessage([FromBody] Update update)
         {
-            _logger.LogInformation("Received a request from the bot!");
-            _logger.LogDebug("Received a request from the bot!");
-            _logger.LogWarning("Received a request from the bot!");
-            _logger.LogError("Received a request from the bot!");
-            _logger.LogCritical("Received a request from the bot!");
-            _logger.LogTrace("Received a request from the bot!");
             await _updateHandlerServiceService.HandleUpdateAsync(update);
             return Ok();
         }

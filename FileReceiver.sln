@@ -24,13 +24,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Tests.Bl", "te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{165C050E-2183-4DB4-A63D-B362532F77F4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{C02CCF88-D61D-41B1-9E65-4DBC4580462D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integrations", "integrations", "{C02CCF88-D61D-41B1-9E65-4DBC4580462D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Integrations.Mega", "src\FileReceiver.Integrations.Mega\FileReceiver.Integrations.Mega.csproj", "{25D09645-AC3C-40E7-8729-979B0D38F57A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Tests.Fakers", "tests\FileReceiver.Tests.Fakers\FileReceiver.Tests.Fakers.csproj", "{E421D5E4-8760-4936-BFB3-3E313EB223D1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FBC36705-5D1A-4AB5-BAA2-B50CDE8C1124}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{FBC36705-5D1A-4AB5-BAA2-B50CDE8C1124}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileReceiver.Infrastructure.Configuration", "src\FileReceiver.Infrastructure.Configuration\FileReceiver.Infrastructure.Configuration.csproj", "{27DC8C49-6776-4B50-AF30-AC1D87AEE754}"
 EndProject

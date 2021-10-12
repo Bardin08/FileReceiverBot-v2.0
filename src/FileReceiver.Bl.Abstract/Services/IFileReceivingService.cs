@@ -13,6 +13,6 @@ namespace FileReceiver.Bl.Abstract.Services
         Task FinishReceivingTransaction(long userId);
         Task<bool> SaveDocument(long userId, Guid sessionId, Document document);
         Task<FileReceivingState> GetFileReceivingStateForUser(long userId);
-        Task<bool> CheckIfSessionExists(Guid token);
+        Task<bool> CheckIfSessionExists(Guid sessionId);
     }
 }
