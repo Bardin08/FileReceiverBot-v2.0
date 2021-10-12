@@ -37,9 +37,9 @@ jobs:
         MegaClient.ApplicationKey: ${{ secrets.MEGA_API_KEY }}
         MegaClient.Login: ${{ secrets.MEGA_LOGIN }}
         MegaClient.Password: ${{ secrets.MEGA_PASSWORD }}
-        Serilog.WriteTo[1].Args.DatabaseUrl: ${{ secrets.MONGO_CONNECTION_STRING }}
-        Serilog.WriteTo[2].Args.Token: ${{ secrets.TELEGRAM_LOG_BOT_TOKEN }}
-        Serilog.WriteTo[2].Args.ChatId: ${{ secrets.TELEGRAM_LOGS_CHAT_ID }}
+        Serilog.WriteTo.Args.DatabaseUrl: ${{ secrets.MONGO_CONNECTION_STRING }}
+        Serilog.WriteTo.Args.Token: ${{ secrets.TELEGRAM_LOG_BOT_TOKEN }}
+        Serilog.WriteTo.Args.ChatId: ${{ secrets.TELEGRAM_LOGS_CHAT_ID }}
 
     - name: Run Azure webapp deploy action using publish profile credentials
       uses: azure/webapps-deploy@v2
