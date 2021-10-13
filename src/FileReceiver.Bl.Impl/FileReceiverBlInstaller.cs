@@ -74,6 +74,7 @@ namespace FileReceiver.Bl.Impl
         {
             services.AddTransient<EditProfileCallbackQueryHandler, EditProfileCallbackQueryHandler>();
             services.AddTransient<FileReceivingSessionCallbackQueryHandler, FileReceivingSessionCallbackQueryHandler>();
+            services.AddTransient<BotMenuCallbackQueryHandler, BotMenuCallbackQueryHandler>();
             services.AddTransient<DefaultCallbackQueryHandler, DefaultCallbackQueryHandler>();
         }
 
