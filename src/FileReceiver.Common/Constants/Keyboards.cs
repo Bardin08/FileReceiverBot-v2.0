@@ -20,5 +20,16 @@ namespace FileReceiver.Common.Constants
             },
         });
 
+        public static readonly InlineKeyboardMarkup BotMenu = new(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Profile", "menu-/profile"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Send File", "menu-/send_file"),
+            },
+        });
     }
 }

@@ -57,7 +57,6 @@ namespace FileReceiver.Bl.Impl.Handlers.TelegramUpdate
                 TransactionData = transactionData,
             };
 
-            // TODO: rewrite with pattern matching
             switch (editingAction)
             {
                 case ProfileEditingAction.UpdateFirstName:

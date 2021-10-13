@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 
 using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Bl.Impl.Services;
+using FileReceiver.Common.Constants;
 
 using Microsoft.Extensions.Logging;
 
@@ -36,7 +37,11 @@ namespace FileReceiver.Tests.Bl.ServicesTests
             await _sut.SendMenuAsync(userId);
 
             // Assert
-            await _botClient.Received(1).SendTextMessageAsync(userId, "This is a bot menu...");
+            await _botClient.Received(1).SendTextMessageAsync(
+                userId,
+                "Menu:",
+                ParseMode.Markdown,
+                replyMarkup: Keyboards.BotMenu);
         }
 
         [Theory]

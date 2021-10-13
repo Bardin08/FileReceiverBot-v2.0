@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 
 using FileReceiver.Bl.Abstract.Services;
+using FileReceiver.Common.Constants;
 
 using Microsoft.Extensions.Logging;
 
@@ -25,14 +26,17 @@ namespace FileReceiver.Bl.Impl.Services
 
         public async Task SendMenuAsync(long userOrChatId)
         {
-            // TODO: Create a real bot menu with buttons which will invoke command handlers and replace plain text with resources file
-            var sentMsg = await _botClient.SendTextMessageAsync(userOrChatId, "This is a bot menu...");
+            var sentMsg = await _botClient.SendTextMessageAsync(
+                userOrChatId,
+                "Menu:",
+                ParseMode.Markdown,
+                replyMarkup: Keyboards.BotMenu);
+
             if (sentMsg is null) _logger.LogWarning("Message wasn't sent to {userId}", userOrChatId);
         }
 
         public async Task SendErrorAsync(long userOrChatId, string errorMessage)
         {
-            // TODO: Update error sending, maybe add an image or smth like that and replace plain text with resources file
             var sentMsg = await _botClient.SendTextMessageAsync(userOrChatId,
                 $"Sorry, an error happen. Error description: {errorMessage}");
             if (sentMsg is null) _logger.LogWarning("Message wasn't sent to {userId}", userOrChatId);
