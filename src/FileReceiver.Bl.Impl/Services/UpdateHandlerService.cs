@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 
 using AutoMapper;
@@ -9,8 +8,6 @@ using FileReceiver.Bl.Abstract.Services;
 using FileReceiver.Common.Extensions;
 using FileReceiver.Common.Models;
 using FileReceiver.Dal.Abstract.Repositories;
-
-using Microsoft.Extensions.Logging;
 
 using Telegram.Bot.Types;
 
@@ -24,7 +21,6 @@ namespace FileReceiver.Bl.Impl.Services
         private readonly ICallbackQueryHandlerFactory _callbackQueryFactory;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IMapper _mapper;
-        private readonly ILogger<UpdateHandlerService> _logger;
 
         public UpdateHandlerService(
             IBotMessagesService botMessagesService,
@@ -32,8 +28,7 @@ namespace FileReceiver.Bl.Impl.Services
             IUpdateHandlerFactory updateHandlerFactory,
             ICallbackQueryHandlerFactory callbackQueryFactory,
             ITransactionRepository transactionRepository,
-            IMapper mapper,
-            ILogger<UpdateHandlerService> logger)
+            IMapper mapper)
         {
             _botMessagesService = botMessagesService;
             _commandHandlerFactory = commandHandlerFactory;
@@ -41,7 +36,6 @@ namespace FileReceiver.Bl.Impl.Services
             _callbackQueryFactory = callbackQueryFactory;
             _transactionRepository = transactionRepository;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task HandleUpdateAsync(Update update)
@@ -81,7 +75,8 @@ namespace FileReceiver.Bl.Impl.Services
                 return;
             }
 
-            if ((await TryGetUpdateHandlerAsync(lastActiveTransactionForUser)) is { } updateHandler)
+            if (lastActiveTransactionForUser != null &&
+                (await TryGetUpdateHandlerAsync(lastActiveTransactionForUser)) is { } updateHandler)
             {
                 await updateHandler.HandleUpdateAsync(update);
             }
